@@ -1,0 +1,20 @@
+---
+import { timeline } from '@/data/profile';
+import { t } from '@/i18n/ui';
+import type { Lang } from '@/data/profile';
+const { lang } = Astro.props as { lang: Lang };
+const tr = t(lang);
+---
+<section id="path" class="mx-auto max-w-7xl px-6 py-32">
+  <h2 class="display reveal mb-16 text-5xl font-bold md:text-7xl">{tr.path}</h2>
+  <ol class="border-l pl-8" style="border-color: var(--accent)">
+    {timeline.map((e) => (
+      <li class="reveal relative pb-12">
+        <span class="absolute -left-[37px] top-2 h-3 w-3 rounded-full" style="background: var(--accent)"></span>
+        <span class="mono text-sm" style="color: var(--muted)">{e.year}</span>
+        <h3 class="display text-3xl font-bold">{e.title[lang]}</h3>
+        <p style="color: var(--muted)">{e.place}</p>
+      </li>
+    ))}
+  </ol>
+</section>

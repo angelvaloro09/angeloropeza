@@ -1,0 +1,21 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Hero from '@/components/sections/Hero.astro';
+import Projects from '@/components/sections/Projects.astro';
+import Skills from '@/components/sections/Skills.astro';
+import Timeline from '@/components/sections/Timeline.astro';
+import Contact from '@/components/sections/Contact.astro';
+import type { Lang } from '@/data/profile';
+
+export function getStaticPaths() {
+  return [{ params: { lang: 'es' } }, { params: { lang: 'en' } }];
+}
+const lang = Astro.params.lang as Lang;
+---
+<BaseLayout lang={lang}>
+  <Hero lang={lang} />
+  <Projects lang={lang} />
+  <Skills lang={lang} />
+  <Timeline lang={lang} />
+  <Contact lang={lang} />
+</BaseLayout>

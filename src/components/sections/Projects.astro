@@ -1,0 +1,28 @@
+---
+import { projects } from '@/data/profile';
+import { t } from '@/i18n/ui';
+import type { Lang } from '@/data/profile';
+const { lang } = Astro.props as { lang: Lang };
+const tr = t(lang);
+---
+<section id="work" class="mx-auto max-w-7xl px-6 py-32">
+  <h2 class="display reveal mb-16 text-5xl font-bold md:text-7xl">{tr.work}</h2>
+  <ul class="border-t" style="border-color: var(--line)">
+    {projects.map((p, i) => (
+      <li class="reveal group border-b" style="border-color: var(--line)">
+        <div class="grid grid-cols-12 items-baseline gap-4 py-8 transition-colors group-hover:[&_h3]:text-[var(--glow)]">
+          <span class="mono col-span-2 text-sm md:col-span-1" style="color: var(--muted)">{String(i + 1).padStart(2, '0')}</span>
+          <div class="col-span-10 md:col-span-5">
+            <h3 class="display text-3xl font-bold transition-colors md:text-5xl">{p.title}</h3>
+            <p class="mono mt-2 text-xs" style="color: var(--muted)">{p.kind[lang]} · {p.year}</p>
+          </div>
+          <p class="col-span-12 md:col-span-4" style="color: var(--muted)">{p.summary[lang]}</p>
+          <div class="col-span-12 flex flex-wrap items-center gap-2 md:col-span-2 md:justify-end">
+            {p.stack.map((s) => <span class="mono rounded-full border px-3 py-1 text-xs" style="border-color: var(--line)">{s}</span>)}
+            {p.repo ? <a class="mono text-xs underline" href={p.repo} rel="noopener">{tr.code} ↗</a> : <span class="mono text-xs" style="color: var(--muted)">{tr.private}</span>}
+          </div>
+        </div>
+      </li>
+    ))}
+  </ul>
+</section>

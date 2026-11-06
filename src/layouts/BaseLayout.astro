@@ -1,0 +1,92 @@
+---
+import '@/styles/global.css';
+import { ClientRouter } from 'astro:transitions';
+import type { Lang } from '@/data/profile';
+import { profile } from '@/data/profile';
+import { t, other } from '@/i18n/ui';
+
+interface Props { lang: Lang; title?: string; }
+const { lang, title = `${profile.name} — ${profile.role[lang]}` } = Astro.props;
+const tr = t(lang);
+const alt = other(lang);
+---
+<!doctype html>
+<html lang={lang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={profile.tagline[lang]} />
+    <title>{title}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=JetBrains+Mono:wght@400&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet" />
+    <script is:inline>
+      const s = localStorage.getItem('theme');
+      if (s) document.documentElement.dataset.theme = s;
+    </script>
+    <ClientRouter />
+  </head>
+  <body>
+    <header id="site-header" class="fixed inset-x-0 top-0 z-50 transition-all duration-300">
+      <div class="mx-auto flex max-w-7xl items-center justify-between px-6 py-5">
+        <a href={`/${lang}/`} class="mono text-sm">{profile.name}</a>
+        <nav class="mono hidden gap-8 text-sm md:flex" aria-label="Main">
+          <a href="#work">{tr.nav.work}</a>
+          <a href="#stack">{tr.nav.stack}</a>
+          <a href="#path">{tr.nav.path}</a>
+          <a href="#contact">{tr.nav.contact}</a>
+        </nav>
+        <div class="mono flex items-center gap-4 text-sm">
+          <a href={`/${alt}/`} hreflang={alt} class="uppercase">{alt}</a>
+          <button id="theme-toggle" aria-label="Toggle theme">◐</button>
+        </div>
+      </div>
+    </header>
+    <main><slot /></main>
+    <script>
+      import Lenis from 'lenis';
+      import gsap from 'gsap';
+      import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+      function init() {
+        const header = document.getElementById('site-header')!;
+        const onScroll = () => {
+          const scrolled = window.scrollY > 40;
+          header.style.backdropFilter = scrolled ? 'blur(14px)' : 'none';
+          header.style.background = scrolled ? 'color-mix(in srgb, var(--bg) 70%, transparent)' : 'transparent';
+          header.style.borderBottom = scrolled ? '1px solid var(--line)' : '1px solid transparent';
+        };
+        window.addEventListener('scroll', onScroll, { passive: true });
+        onScroll();
+
+        document.getElementById('theme-toggle')?.addEventListener('click', () => {
+          const next = document.documentElement.dataset.theme === 'light' ? 'dark' : 'light';
+          document.documentElement.dataset.theme = next;
+          localStorage.setItem('theme', next);
+        });
+
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+        gsap.registerPlugin(ScrollTrigger);
+        const lenis = new Lenis();
+        lenis.on('scroll', ScrollTrigger.update);
+        gsap.ticker.add((time) => lenis.raf(time * 1000));
+        gsap.ticker.lagSmoothing(0);
+
+        gsap.utils.toArray<HTMLElement>('.reveal').forEach((el) => {
+          gsap.to(el, { opacity: 1, y: 0, duration: 0.9, ease: 'power3.out',
+            scrollTrigger: { trigger: el, start: 'top 88%' } });
+        });
+
+        document.querySelectorAll<HTMLElement>('[data-count]').forEach((el) => {
+          const target = Number(el.dataset.count);
+          const o = { v: 0 };
+          gsap.to(o, { v: target, duration: 1.6, ease: 'power2.out',
+            onUpdate: () => (el.textContent = String(Math.round(o.v))),
+            scrollTrigger: { trigger: el, start: 'top 90%', once: true } });
+        });
+      }
+      document.addEventListener('astro:page-load', init);
+    </script>
+  </body>
+</html>

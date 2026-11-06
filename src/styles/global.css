@@ -1,0 +1,31 @@
+@import 'tailwindcss';
+
+:root {
+  --bg: #0a0d12;
+  --surface: #11161d;
+  --text: #e8ecf1;
+  --muted: #6a7681;
+  --accent: #1e6ef3;
+  --glow: #4d8fff;
+  --line: rgba(255, 255, 255, 0.08);
+}
+:root[data-theme='light'] {
+  --bg: #f6f8fb;
+  --surface: #ffffff;
+  --text: #0a0d12;
+  --muted: #5b6672;
+  --line: rgba(0, 0, 0, 0.1);
+}
+
+html { background: var(--bg); color: var(--text); font-family: 'Inter', system-ui, sans-serif; scroll-behavior: auto; }
+body { margin: 0; }
+.display { font-family: 'Space Grotesk', 'Inter', sans-serif; letter-spacing: -0.04em; line-height: 0.95; }
+.mono { font-family: 'JetBrains Mono', ui-monospace, monospace; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; }
+.reveal { opacity: 0; transform: translateY(24px); }
+a:focus-visible, button:focus-visible { outline: 2px solid var(--glow); outline-offset: 3px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal { opacity: 1; transform: none; }
+  * { animation: none !important; transition: none !important; }
+}

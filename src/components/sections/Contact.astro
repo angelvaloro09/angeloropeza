@@ -1,0 +1,18 @@
+---
+import { profile } from '@/data/profile';
+import { t } from '@/i18n/ui';
+import type { Lang } from '@/data/profile';
+const { lang } = Astro.props as { lang: Lang };
+const tr = t(lang);
+---
+<section id="contact" class="mx-auto max-w-7xl px-6 pb-16 pt-32">
+  <p class="mono reveal mb-6 text-sm" style="color: var(--muted)">{tr.contact}</p>
+  <a href={`mailto:${profile.email}`} class="display reveal block break-all text-[clamp(2rem,8vw,7rem)] font-bold transition-colors hover:text-[var(--glow)]">{profile.email}</a>
+  <div class="mono mt-12 flex flex-wrap gap-8 text-sm">
+    <a href={profile.github} rel="noopener">GitHub ↗</a>
+    <a href={profile.linkedin} rel="noopener">LinkedIn ↗</a>
+  </div>
+  <footer class="mono mt-24 flex justify-between border-t pt-6 text-xs" style="border-color: var(--line); color: var(--muted)">
+    <span>© {new Date().getFullYear()} {profile.name}</span><span>{tr.footer}</span>
+  </footer>
+</section>

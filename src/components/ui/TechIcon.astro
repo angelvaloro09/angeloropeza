@@ -1,0 +1,69 @@
+---
+import { Icon } from 'astro-icon/components';
+import type { TechId } from '@/data/stack';
+import { getTech } from '@/data/stack';
+
+interface Props {
+  id: TechId;
+  size?: number | string;
+  mono?: boolean;
+  class?: string;
+  title?: string;
+}
+
+const {
+  id,
+  size = 24,
+  mono = false,
+  class: className = '',
+  title,
+} = Astro.props;
+
+const tech = getTech(id);
+if (!tech) {
+  throw new Error(`[TechIcon] Unknown tech id: "${id}"`);
+}
+
+const dimension = typeof size === 'number' ? `${size}px` : size;
+const pad = typeof size === 'number' ? `${Math.max(2, Math.round(size * 0.14))}px` : '3px';
+---
+
+<span
+  class:list={[
+    'tech-icon inline-flex items-center justify-center shrink-0 align-middle',
+    mono && 'tech-icon-mono',
+    className,
+  ]}
+  style={{ width: dimension, height: dimension, '--pad': pad }}
+  title={title ?? tech.name}
+>
+  <Icon
+    name={tech.icon as any}
+    size={size}
+    is:inline
+    aria-hidden="true"
+    class="h-full w-full"
+  />
+</span>
+
+<style>
+  :global([data-theme='dark']) .tech-icon {
+    background: #F7F5F0;
+    color: #17171A;
+    border-radius: 7px;
+    padding: var(--pad, 3px);
+    box-sizing: border-box;
+  }
+
+  .tech-icon-mono {
+    filter: grayscale(1);
+    opacity: 0.85;
+    transition: filter 0.2s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.2s ease;
+  }
+
+  :global(.group:hover) .tech-icon-mono,
+  .tech-icon-mono:hover {
+    filter: grayscale(0);
+    opacity: 1;
+  }
+</style>

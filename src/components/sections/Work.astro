@@ -1,0 +1,836 @@
+---
+import { Image } from 'astro:assets';
+import { projects, type Project } from '@/data/projects';
+import { getTech } from '@/data/stack';
+import type { Lang } from '@/data/profile';
+import Doodle from '@/components/ui/Doodle.astro';
+import TechIcon from '@/components/ui/TechIcon.astro';
+import BrowserFrame from '@/components/ui/BrowserFrame.astro';
+import ProjectArt from '@/components/ui/ProjectArt.astro';
+import { workCopy } from '@/i18n/sections/work';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const c = workCopy[lang];
+
+const cases = projects.filter((p) => p.case);
+// Backend projects that have verified highlights get a card in the Backend section instead.
+const rest = projects.filter((p) => !p.case && !(p.backend && p.highlights?.length));
+const pad = (n: number) => String(n).padStart(2, '0');
+
+const appIconDefs = [
+  { key: 'icon-polinexu', name: 'PoliNexu' },
+  { key: 'icon-bienescript', name: 'Bienescript' },
+  { key: 'icon-trailers', name: 'Trailers Tracker' },
+];
+const tilesFor = (p: Project) =>
+  p.slug === 'mobile'
+    ? appIconDefs.flatMap((d) => (p.images.extra[d.key] ? [{ ...d, img: p.images.extra[d.key] }] : []))
+    : [];
+const tileRotations = ['-5deg', '3deg', '-2deg'];
+
+/** Kind text already ends with "· Freelance" for client work; the tag says it, so drop the duplicate. */
+const kindOf = (p: Project) => (p.client ? p.kind[lang].replace(/\s*·\s*Freelance$/i, '') : p.kind[lang]);
+
+const coverAlt = (p: Project) =>
+  p.imageNote ? c.alt.comp(p.title, p.imageNote[lang]) : c.alt.screenshot(p.title);
+---
+
+<section id="work" class="work relative mx-auto max-w-7xl px-6 py-32" aria-labelledby="work-title">
+  <header class="mb-24 grid items-end gap-8 md:grid-cols-12">
+    <div class="reveal relative md:col-span-8">
+      <p class="mono mb-5 text-sm text-muted">{c.eyebrow}</p>
+      <h2 id="work-title" class="display text-5xl font-bold md:text-7xl lg:text-8xl">
+        {c.title.before}<span class="serif-accent relative inline-block font-normal">
+          {c.title.accent}
+          <Doodle kind="squiggle" class="absolute -bottom-3 left-0 w-full text-accent" />
+        </span>
+      </h2>
+      <Doodle kind="asterisk" class="absolute -top-6 right-0 hidden w-10 rotate-12 text-ink md:block" />
+    </div>
+    <p class="reveal text-lg leading-relaxed text-muted md:col-span-4">{c.intro}</p>
+  </header>
+
+  <!-- Case blocks -->
+  <div class="flex flex-col gap-32 md:gap-44">
+    {cases.map((p, i) => {
+      const flip = i % 2 === 1;
+      const [shotA, shotB] = p.images.shots;
+      const isBase = p.slug === 'base';
+      const brick = isBase ? p.images.extra['art-brick'] : undefined;
+      const crowd = isBase ? p.images.extra['art-crowd'] : undefined;
+      const showShotB = shotB && !isBase;
+      return (
+        <article
+          class="case grid items-center gap-12 lg:grid-cols-12 lg:gap-16"
+          data-flip={flip ? 'yes' : 'no'}
+          aria-labelledby={`case-${p.slug}`}
+        >
+          <figure class:list={['reveal m-0 lg:col-span-7', flip ? 'lg:order-2' : 'lg:order-1']}>
+            <div class:list={['stage', (brick || crowd) && 'has-art']} style={`--r-a:${flip ? '-2.5deg' : '2.5deg'};--r-b:${flip ? '3deg' : '-3deg'}`}>
+              {p.images.cover && (
+                <BrowserFrame
+                  image={p.images.cover}
+                  alt={coverAlt(p)}
+                  address={p.title}
+                  sizes="(min-width: 1024px) 720px, 100vw"
+                />
+              )}
+
+              {!p.images.cover && (
+                <ProjectArt slug={p.slug} title={p.title} kind={kindOf(p)} stack={p.stack} decorative class="case-art" />
+              )}
+
+              {shotA && (
+                <div class="note shot a">
+                  <Image
+                    src={shotA}
+                    alt={c.alt.shot(p.title, 2)}
+                    widths={[320, 480, 640]}
+                    sizes="(min-width: 1024px) 330px, 46vw"
+                    loading="lazy"
+                    decoding="async"
+                    class="block aspect-[16/10] w-full rounded-[8px] object-cover object-top"
+                  />
+                </div>
+              )}
+              {showShotB && (
+                <div class="note shot b">
+                  <Image
+                    src={shotB}
+                    alt={c.alt.shot(p.title, 3)}
+                    widths={[240, 360, 480]}
+                    sizes="(min-width: 1024px) 230px, 32vw"
+                    loading="lazy"
+                    decoding="async"
+                    class="block aspect-[16/10] w-full rounded-[8px] object-cover object-top"
+                  />
+                </div>
+              )}
+
+              {brick && (
+                <div class="art brick">
+                  <Image
+                    src={brick}
+                    alt={c.alt.artBrick}
+                    widths={[200, 320, 480]}
+                    sizes="(min-width: 1024px) 180px, 28vw"
+                    loading="lazy"
+                    decoding="async"
+                    class="block h-auto w-full mix-blend-multiply"
+                  />
+                </div>
+              )}
+              {crowd && (
+                <div class="art crowd">
+                  <Image
+                    src={crowd}
+                    alt={c.alt.artCrowd}
+                    widths={[160, 240, 360]}
+                    sizes="(min-width: 1024px) 160px, 26vw"
+                    loading="lazy"
+                    decoding="async"
+                    class="block h-auto w-full mix-blend-multiply"
+                  />
+                </div>
+              )}
+            </div>
+
+            {(p.imageNote || isBase) && (
+              <figcaption class="mono mt-2 flex flex-col gap-1 text-xs text-muted">
+                {p.imageNote && <span>{p.imageNote[lang]}</span>}
+                {isBase && <span>{c.baseCredit}</span>}
+              </figcaption>
+            )}
+          </figure>
+
+          <div class:list={['reveal lg:col-span-5', flip ? 'lg:order-1' : 'lg:order-2']}>
+            <p class="mono text-xs tracking-wide text-muted">{c.caseOf(pad(i + 1), pad(cases.length))}</p>
+            <h3 id={`case-${p.slug}`} class="display mt-3 text-5xl font-bold md:text-6xl">{p.title}</h3>
+
+            <p class="mono mt-5 text-sm text-muted">
+              <span class="dot-sep">{kindOf(p)}</span><span>{p.year}</span>
+            </p>
+
+            <div class="mt-4 flex flex-wrap items-center gap-2">
+              {p.status !== 'shipped' && <span class="chip" data-status={p.status}>{c.status[p.status]}</span>}
+              {p.client && <span class="tag">{c.freelance}</span>}
+              {p.backend && <span class="tag">Backend</span>}
+            </div>
+
+            <p class="mt-7 text-lg leading-relaxed">{p.summary[lang]}</p>
+
+            {p.role && (
+              <p class="mono mt-5 text-sm">
+                <span class="text-muted">{c.role}</span><span class="mx-2 text-muted" aria-hidden="true">/</span>{p.role[lang]}
+              </p>
+            )}
+
+            {p.stack.length > 0 && (
+              <ul class="mt-7 flex flex-wrap gap-x-5 gap-y-3" aria-label={c.stackLabel}>
+                {p.stack.map((id) => (
+                  <li class="group inline-flex items-center gap-2 text-sm">
+                    <TechIcon id={id} size={20} mono />
+                    <span>{getTech(id)?.name ?? id}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+
+            <div class="mt-9 flex flex-wrap items-center gap-4">
+              {p.links.repo && (
+                <a class="btn" href={p.links.repo} target="_blank" rel="noopener noreferrer">{c.viewCode} <span aria-hidden="true">↗</span></a>
+              )}
+              {p.links.live && (
+                <a class="btn" href={p.links.live} target="_blank" rel="noopener noreferrer">{c.viewLive} <span aria-hidden="true">↗</span></a>
+              )}
+              {!p.links.repo && p.status !== 'concept' && (
+                <span class="private mono">
+                  <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="7" width="10" height="7" rx="1.5" /><path d="M5 7V5a3 3 0 0 1 6 0v2" /></svg>
+                  {c.privateCode}
+                </span>
+              )}
+            </div>
+          </div>
+        </article>
+      );
+    })}
+  </div>
+
+  <!-- Project index -->
+  <div class="mt-44">
+    <div class="reveal relative mb-10 flex flex-wrap items-end justify-between gap-x-8 gap-y-3">
+      <h3 class="display text-4xl font-bold md:text-6xl">
+        {c.index.title.before}<span class="serif-accent font-normal">{c.index.title.accent}</span>
+      </h3>
+      <Doodle kind="arrow" class="absolute -top-8 left-[58%] hidden w-14 rotate-[-12deg] text-ink md:block" />
+      <p class="idx-hint mono text-xs text-muted">{c.index.hint}</p>
+    </div>
+
+    <ol class="idx" data-work-index aria-label={c.index.label}>
+      {rest.map((p, i) => {
+        const tiles = tilesFor(p);
+        return (
+          <li class="idx-item" data-item data-slug={p.slug}>
+            <div class="idx-row" data-row role="group" aria-labelledby={`idx-${p.slug}`}>
+              <span class="idx-num mono" aria-hidden="true">{pad(cases.length + i + 1)}</span>
+
+              <div class="idx-main">
+                <h4 id={`idx-${p.slug}`} class="idx-title display">{p.title}</h4>
+                <p class="mono mt-3 flex flex-wrap items-center gap-y-2 text-xs text-muted">
+                  <span class="dot-sep">{kindOf(p)}</span><span>{p.year}</span>
+                  {p.client && <span class="tag ml-3">{c.freelance}</span>}
+                </p>
+                <p class="mt-4 max-w-xl text-sm leading-relaxed text-muted">{p.summary[lang]}</p>
+
+                <figure class="idx-thumb m-0 mt-5">
+                  {tiles.length > 0 ? (
+                    <div class="apps">
+                      {tiles.map((t, k) => (
+                        <div class="app-tile" style={`--r:${tileRotations[k % 3]}`}>
+                          <Image src={t.img} alt={c.alt.appIcon(t.name)} widths={[96, 192]} sizes="96px" loading="lazy" decoding="async" class="block h-full w-full object-cover" />
+                        </div>
+                      ))}
+                    </div>
+                  ) : p.images.cover ? (
+                    <Image
+                      src={p.images.cover}
+                      alt={coverAlt(p)}
+                      widths={[320, 480, 640]}
+                      sizes="(min-width: 640px) 352px, 80vw"
+                      loading="lazy"
+                      decoding="async"
+                      class="block aspect-[16/10] w-full max-w-[22rem] rounded-[14px] border-[1.5px] border-ink object-cover object-top"
+                    />
+                  ) : (
+                    <ProjectArt slug={p.slug} title={p.title} kind={kindOf(p)} stack={p.stack} class="max-w-[22rem]" />
+                  )}
+                  {p.imageNote && <figcaption class="mono mt-2 text-xs text-muted">{p.imageNote[lang]}</figcaption>}
+                </figure>
+              </div>
+
+              {p.stack.length > 0 && (
+                <ul class="idx-stack" aria-label={c.stackLabel}>
+                  {p.stack.map((id) => (
+                    <li class="group">
+                      <TechIcon id={id} size={22} mono />
+                      <span class="sr-only">{getTech(id)?.name ?? id}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+
+              <div class="idx-links">
+                {p.status !== 'shipped' && <span class="chip" data-status={p.status}>{c.status[p.status]}</span>}
+                {p.links.repo && (
+                  <a class="idx-link mono" href={p.links.repo} target="_blank" rel="noopener noreferrer">{c.viewCode} <span aria-hidden="true">↗</span></a>
+                )}
+                {p.links.live && (
+                  <a class="idx-link mono" href={p.links.live} target="_blank" rel="noopener noreferrer">{c.viewLive} <span aria-hidden="true">↗</span></a>
+                )}
+                {!p.links.repo && p.status !== 'concept' && <span class="private mono">{c.privateCode}</span>}
+              </div>
+            </div>
+          </li>
+        );
+      })}
+    </ol>
+  </div>
+
+  <!-- Floating preview (hover-capable pointers only; positioned by the script) -->
+  <div class="idx-float" data-float aria-hidden="true">
+    <div class="idx-float-inner">
+      {rest.map((p) => {
+        const tiles = tilesFor(p);
+        return (
+          <div class="pv" data-pv={p.slug}>
+            {tiles.length > 0 ? (
+              <div class="apps apps-card">
+                {tiles.map((t, k) => (
+                  <div class="app-tile" style={`--r:${tileRotations[k % 3]}`}>
+                    <Image src={t.img} alt="" widths={[96, 192]} sizes="96px" loading="lazy" decoding="async" class="block h-full w-full object-cover" />
+                  </div>
+                ))}
+              </div>
+            ) : p.images.cover ? (
+              <Image
+                src={p.images.cover}
+                alt=""
+                widths={[400, 800]}
+                sizes="400px"
+                loading="lazy"
+                decoding="async"
+                class="block h-full w-full rounded-[14px] border-[1.5px] border-ink object-cover object-top"
+              />
+            ) : (
+              <ProjectArt slug={p.slug} title={p.title} kind={kindOf(p)} stack={p.stack} decorative />
+            )}
+            {p.imageNote && <span class="pv-note mono">{p.imageNote[lang]}</span>}
+          </div>
+        );
+      })}
+    </div>
+  </div>
+</section>
+
+<style>
+  .work {
+    overflow-x: clip;
+  }
+
+  /* ---------- shared bits ---------- */
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.15rem 0.7rem;
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 0.75rem;
+    line-height: 1.5;
+    color: var(--ink);
+    background: var(--accent-soft);
+    border: 1.5px solid var(--ink);
+    border-radius: 999px;
+    white-space: nowrap;
+  }
+  .chip::before {
+    content: '';
+    width: 0.5rem;
+    height: 0.5rem;
+    border: 1.5px solid var(--ink);
+    border-radius: 999px;
+  }
+  .chip[data-status='shipped']::before {
+    background: var(--ink);
+  }
+  .chip[data-status='building']::before {
+    background: var(--accent);
+  }
+  .chip[data-status='concept']::before {
+    background: transparent;
+    border-style: dashed;
+  }
+
+  .tag {
+    display: inline-block;
+    padding: 0.1rem 0.6rem;
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 0.7rem;
+    line-height: 1.5;
+    color: var(--ink);
+    border: 1px dashed var(--ink);
+    border-radius: 6px;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.6rem 1.2rem;
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 0.8125rem;
+    color: var(--ink);
+    background: var(--surface);
+    border: 1.5px solid var(--ink);
+    border-radius: 999px;
+    box-shadow: 3px 3px 0 var(--ink);
+    transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.2s ease;
+  }
+  .btn:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 5px 5px 0 var(--ink);
+  }
+
+  .private {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-size: 0.8125rem;
+    color: var(--muted);
+  }
+
+  /* ---------- case blocks ---------- */
+  .stage {
+    position: relative;
+    padding: 0.5rem 0 3.25rem;
+  }
+  .stage.has-art {
+    padding-top: 2.75rem;
+  }
+
+  .shot {
+    position: absolute;
+    bottom: 0;
+    z-index: 2;
+    width: 46%;
+    padding: 0.4rem;
+    border-radius: 12px;
+    transform: rotate(var(--r-a));
+  }
+  .shot.a {
+    right: 0;
+  }
+  .shot.b {
+    left: 4%;
+    bottom: -0.35rem;
+    width: 32%;
+    transform: rotate(var(--r-b));
+  }
+  .shot:hover {
+    transform: rotate(0deg) translate(-2px, -2px);
+  }
+  .case[data-flip='yes'] .shot.a {
+    right: auto;
+    left: 0;
+  }
+  .case[data-flip='yes'] .shot.b {
+    left: auto;
+    right: 4%;
+  }
+
+  .art {
+    position: absolute;
+    z-index: 2;
+    padding: 0.45rem;
+    background: #f7f5f0; /* fixed paper tone so the multiply blend works in dark mode too */
+    border: 1.5px solid var(--ink);
+    border-radius: 14px;
+    box-shadow: 3px 3px 0 var(--ink);
+  }
+  .art.brick {
+    top: 0;
+    right: 4%;
+    width: 27%;
+    transform: rotate(5deg);
+  }
+  .art.crowd {
+    left: 3%;
+    bottom: -0.5rem;
+    width: 24%;
+    transform: rotate(-5deg);
+  }
+  .case[data-flip='yes'] .art.brick {
+    right: auto;
+    left: 4%;
+    transform: rotate(-5deg);
+  }
+  .case[data-flip='yes'] .art.crowd {
+    left: auto;
+    right: 3%;
+    transform: rotate(5deg);
+  }
+
+  @media (min-width: 1024px) {
+    .shot.a {
+      right: -1.75rem;
+    }
+    .case[data-flip='yes'] .shot.a {
+      right: auto;
+      left: -1.75rem;
+    }
+  }
+
+  /* ---------- index ---------- */
+  .idx {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-top: 1.5px solid var(--ink);
+  }
+
+  .idx-item {
+    border-bottom: 1px solid var(--line);
+    transition: opacity 0.3s ease;
+  }
+
+  .idx-row {
+    display: grid;
+    grid-template-columns: 2.25rem minmax(0, 1fr);
+    gap: 1rem;
+    padding: 1.75rem 0;
+  }
+  .idx-row:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+
+  .idx-num {
+    padding-top: 0.55rem;
+    font-size: 0.8125rem;
+    color: var(--muted);
+  }
+  .idx-main,
+  .idx-stack,
+  .idx-links {
+    grid-column: 2;
+  }
+
+  .idx-title {
+    margin: 0;
+    font-size: clamp(2rem, 6vw, 4.25rem);
+    font-weight: 700;
+    transition: color 0.2s ease, transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  .idx-stack {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .idx-links {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 1rem;
+  }
+  .idx-link {
+    font-size: 0.8125rem;
+    color: var(--ink);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+  .idx-link:hover {
+    color: var(--accent);
+  }
+
+  .idx-hint {
+    display: none;
+    margin: 0;
+  }
+
+  /* touch thumbnails: rendered inline; the floating preview replaces them on mouse devices */
+  .apps {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+  }
+  .apps-card {
+    justify-content: center;
+    gap: 6%;
+    width: 100%;
+    max-width: 22rem;
+    aspect-ratio: 16 / 10;
+    background-color: var(--surface);
+    background-image: radial-gradient(circle, var(--line) 1px, transparent 1.6px);
+    background-size: 14px 14px;
+    border: 1.5px solid var(--ink);
+    border-radius: 14px;
+  }
+  .app-tile {
+    width: 4.5rem;
+    aspect-ratio: 1;
+    overflow: hidden;
+    background: var(--surface);
+    border: 1.5px solid var(--ink);
+    border-radius: 22%;
+    box-shadow: 3px 3px 0 var(--ink);
+    transform: rotate(var(--r));
+  }
+  .apps-card .app-tile {
+    width: 22%;
+  }
+
+  @media (min-width: 768px) {
+    .idx-row {
+      grid-template-columns: 4rem minmax(0, 1.7fr) minmax(0, 1fr) minmax(8.5rem, auto);
+      align-items: start;
+      gap: 1.5rem;
+      padding: 2.25rem 0;
+    }
+    .idx-main,
+    .idx-stack,
+    .idx-links {
+      grid-column: auto;
+    }
+    .idx-num {
+      padding-top: 0.9rem;
+    }
+    .idx-stack {
+      padding-top: 0.9rem;
+    }
+    .idx-links {
+      flex-direction: column;
+      align-items: flex-end;
+      padding-top: 0.75rem;
+      text-align: right;
+    }
+  }
+
+  /* ---------- floating preview ---------- */
+  .idx-float {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 35;
+    width: min(25rem, 32vw);
+    pointer-events: none;
+    clip-path: inset(100% 0% 0% 0%);
+    will-change: transform, clip-path;
+  }
+  .idx-float-inner {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 10;
+  }
+  .pv {
+    position: absolute;
+    inset: 0;
+    display: none;
+  }
+  .pv.is-on {
+    display: block;
+  }
+  .pv-note {
+    position: absolute;
+    left: 0.7rem;
+    bottom: 0.7rem;
+    padding: 0.15rem 0.65rem;
+    font-size: 0.7rem;
+    line-height: 1.5;
+    color: var(--ink);
+    background: var(--bg);
+    border: 1px solid var(--ink);
+    border-radius: 999px;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .idx-thumb {
+      display: none;
+    }
+    .idx-float {
+      display: block;
+    }
+    .idx-hint {
+      display: block;
+    }
+    .idx-item:hover .idx-title,
+    .idx-item[data-on] .idx-title {
+      color: var(--accent);
+      transform: translateX(0.5rem);
+    }
+    .idx[data-active] .idx-item:not([data-on]) {
+      opacity: 0.35;
+    }
+  }
+</style>
+
+<script>
+  import gsap from 'gsap';
+
+  const FINE = '(hover: hover) and (pointer: fine)';
+  const REDUCED = '(prefers-reduced-motion: reduce)';
+  const HIDDEN = 'inset(100% 0% 0% 0%)';
+  const SHOWN = 'inset(0% 0% 0% 0%)';
+  const WIPED = 'inset(0% 0% 100% 0%)';
+
+  function initWorkIndex() {
+    const rootEl = document.querySelector<HTMLElement>('[data-work-index]');
+    const floatEl = document.querySelector<HTMLElement>('[data-float]');
+    if (!rootEl || !floatEl || rootEl.dataset.bound === '1') return;
+    const root: HTMLElement = rootEl;
+    const float: HTMLElement = floatEl;
+
+    const fine = window.matchMedia(FINE);
+    if (!fine.matches) return; // touch: inline thumbnails, no floating preview
+    root.dataset.bound = '1';
+
+    const reduced = window.matchMedia(REDUCED).matches;
+    const items = Array.from(root.querySelectorAll<HTMLElement>('[data-item]'));
+    const pvs = new Map<string, HTMLElement>();
+    float.querySelectorAll<HTMLElement>('[data-pv]').forEach((el) => pvs.set(el.dataset.pv ?? '', el));
+
+    // Keyboard reachability only matters where the preview exists.
+    items.forEach((item) => item.querySelector('[data-row]')?.setAttribute('tabindex', '0'));
+
+    gsap.set(float, { clipPath: HIDDEN, x: 0, y: 0, rotation: 0 });
+
+    const xTo = reduced ? null : gsap.quickTo(float, 'x', { duration: 0.55, ease: 'power3.out' });
+    const yTo = reduced ? null : gsap.quickTo(float, 'y', { duration: 0.55, ease: 'power3.out' });
+    const rTo = reduced ? null : gsap.quickTo(float, 'rotation', { duration: 0.7, ease: 'power3.out' });
+
+    type State = 'hidden' | 'shown' | 'hiding';
+    let state: State = 'hidden';
+    let mode: 'pointer' | 'focus' = 'pointer';
+    let active: string | null = null;
+    let tiltTimer = 0;
+
+    const clamp = gsap.utils.clamp;
+
+    function place(x: number, y: number, immediate: boolean) {
+      const w = float.offsetWidth;
+      const h = float.offsetHeight;
+      const margin = 16;
+      const tx = clamp(margin, Math.max(margin, window.innerWidth - w - margin), x);
+      const ty = clamp(margin, Math.max(margin, window.innerHeight - h - margin), y);
+      if (immediate || !xTo || !yTo) {
+        gsap.set(float, { x: tx, y: ty });
+        xTo?.(tx);
+        yTo?.(ty);
+      } else {
+        xTo(tx);
+        yTo(ty);
+      }
+    }
+
+    function pointerTarget(clientX: number, clientY: number) {
+      const w = float.offsetWidth;
+      const h = float.offsetHeight;
+      const gap = 28;
+      const x = clientX + gap + w > window.innerWidth - 16 ? clientX - gap - w : clientX + gap;
+      return { x, y: clientY - h / 2 };
+    }
+
+    function activate(slug: string) {
+      active = slug;
+      root.dataset.active = slug;
+      items.forEach((item) => {
+        if (item.dataset.slug === slug) item.setAttribute('data-on', '');
+        else item.removeAttribute('data-on');
+      });
+      pvs.forEach((el, key) => el.classList.toggle('is-on', key === slug));
+    }
+
+    function reveal() {
+      gsap.killTweensOf(float, 'clipPath');
+      if (reduced) {
+        gsap.set(float, { clipPath: SHOWN });
+      } else {
+        gsap.to(float, { clipPath: SHOWN, duration: 0.6, ease: 'power3.out', overwrite: 'auto' });
+      }
+      state = 'shown';
+    }
+
+    function show(slug: string, x: number, y: number, nextMode: 'pointer' | 'focus') {
+      mode = nextMode;
+      const wasHidden = state === 'hidden';
+      activate(slug);
+      place(x, y, wasHidden || nextMode === 'focus');
+      reveal();
+    }
+
+    function hide() {
+      active = null;
+      delete root.dataset.active;
+      items.forEach((item) => item.removeAttribute('data-on'));
+      if (state === 'hidden') return;
+      if (reduced) {
+        gsap.set(float, { clipPath: HIDDEN });
+        pvs.forEach((el) => el.classList.remove('is-on'));
+        state = 'hidden';
+        return;
+      }
+      state = 'hiding';
+      gsap.killTweensOf(float, 'clipPath');
+      gsap.to(float, {
+        clipPath: WIPED,
+        duration: 0.45,
+        ease: 'power3.inOut',
+        overwrite: 'auto',
+        onComplete: () => {
+          if (state !== 'hiding') return;
+          gsap.set(float, { clipPath: HIDDEN });
+          pvs.forEach((el) => el.classList.remove('is-on'));
+          state = 'hidden';
+        },
+      });
+    }
+
+    items.forEach((item) => {
+      const slug = item.dataset.slug ?? '';
+
+      item.addEventListener('pointerenter', (e) => {
+        if (e.pointerType !== 'mouse' || !fine.matches) return;
+        const { x, y } = pointerTarget(e.clientX, e.clientY);
+        show(slug, x, y, 'pointer');
+      });
+
+      item.addEventListener('focusin', (e) => {
+        if (!fine.matches) return;
+        const target = e.target as HTMLElement;
+        if (!target.matches(':focus-visible')) return; // mouse clicks on links should not trigger it
+        const rect = item.getBoundingClientRect();
+        const w = float.offsetWidth;
+        const h = float.offsetHeight;
+        show(slug, window.innerWidth - w - 40, rect.top + rect.height / 2 - h / 2, 'focus');
+      });
+
+      item.addEventListener('focusout', (e) => {
+        const next = e.relatedTarget as Node | null;
+        if (next && item.contains(next)) return;
+        if (mode === 'focus' && active === slug) hide();
+      });
+    });
+
+    root.addEventListener('pointermove', (e) => {
+      if (e.pointerType !== 'mouse' || mode !== 'pointer' || state === 'hidden' || !fine.matches) return;
+      const { x, y } = pointerTarget(e.clientX, e.clientY);
+      place(x, y, false);
+      if (rTo) {
+        rTo(clamp(-7, 7, e.movementX * 0.3));
+        window.clearTimeout(tiltTimer);
+        tiltTimer = window.setTimeout(() => rTo(0), 90);
+      }
+    });
+
+    root.addEventListener('pointerleave', (e) => {
+      if (e.pointerType !== 'mouse' || mode !== 'pointer') return;
+      hide();
+    });
+
+    root.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') hide();
+    });
+  }
+
+  document.addEventListener('astro:page-load', initWorkIndex);
+  if (document.readyState !== 'loading') initWorkIndex();
+</script>

@@ -2,3 +2,9 @@ node_modules/
 dist/
 .astro/
 .env
+.tmp-capture/
+
+# Internal working notes (not published)
+docs/capture-report-*.md
+docs/phase*.md
+docs/PHASE3-BRIEF.md

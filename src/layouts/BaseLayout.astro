@@ -9,6 +9,9 @@ interface Props { lang: Lang; title?: string; }
 const { lang, title = `${profile.name} — ${profile.role[lang]}` } = Astro.props;
 const tr = t(lang);
 const alt = other(lang);
+const site = Astro.site ?? new URL('https://angeloropeza.me');
+const canonical = new URL(Astro.url.pathname, site).href;
+const ogImage = new URL('/brand/avatar-noanoa.jpeg', site).href;
 ---
 <!doctype html>
 <html lang={lang}>
@@ -17,9 +20,21 @@ const alt = other(lang);
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={profile.tagline[lang]} />
     <title>{title}</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="canonical" href={canonical} />
+    <link rel="alternate" hreflang="es" href={new URL('/es/', site).href} />
+    <link rel="alternate" hreflang="en" href={new URL('/en/', site).href} />
+    <link rel="alternate" hreflang="x-default" href={new URL('/es/', site).href} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={profile.tagline[lang]} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:locale" content={lang === 'es' ? 'es_MX' : 'en_US'} />
+    <meta name="twitter:card" content="summary" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=JetBrains+Mono:wght@400&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@1&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet" />
     <script is:inline>
       const s = localStorage.getItem('theme');
       if (s) document.documentElement.dataset.theme = s;
@@ -27,11 +42,13 @@ const alt = other(lang);
     <ClientRouter />
   </head>
   <body>
-    <header id="site-header" class="fixed inset-x-0 top-0 z-50 transition-all duration-300">
+    <div aria-hidden="true" class="paper-grain pointer-events-none fixed inset-0 z-50 select-none opacity-[0.04]"></div>
+    <header id="site-header" class="fixed inset-x-0 top-0 z-40 transition-all duration-300">
       <div class="mx-auto flex max-w-7xl items-center justify-between px-6 py-5">
         <a href={`/${lang}/`} class="mono text-sm">{profile.name}</a>
         <nav class="mono hidden gap-8 text-sm md:flex" aria-label="Main">
           <a href="#work">{tr.nav.work}</a>
+          <a href="#backend">{tr.nav.backend}</a>
           <a href="#stack">{tr.nav.stack}</a>
           <a href="#path">{tr.nav.path}</a>
           <a href="#contact">{tr.nav.contact}</a>
@@ -60,7 +77,8 @@ const alt = other(lang);
         onScroll();
 
         document.getElementById('theme-toggle')?.addEventListener('click', () => {
-          const next = document.documentElement.dataset.theme === 'light' ? 'dark' : 'light';
+          const current = document.documentElement.dataset.theme || 'light';
+          const next = current === 'dark' ? 'light' : 'dark';
           document.documentElement.dataset.theme = next;
           localStorage.setItem('theme', next);
         });

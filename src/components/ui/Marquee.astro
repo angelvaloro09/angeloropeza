@@ -1,0 +1,111 @@
+---
+/**
+ * Generic CSS-only marquee. Slot content is rendered twice (the second copy is
+ * aria-hidden + inert) and the track slides by exactly -50% for a seamless loop.
+ * Pauses on hover and focus-within; the region is focusable so keyboard users can
+ * pause it too. Under prefers-reduced-motion it becomes a static, wrapped list.
+ */
+interface Props {
+  /** Scroll right instead of left. */
+  reverse?: boolean;
+  /** Seconds for one full loop. */
+  duration?: number;
+  /** Any CSS length between items. */
+  gap?: string;
+  /** Accessible name of the region. */
+  label?: string;
+  /** Make the region keyboard-focusable so focus pauses it. */
+  focusable?: boolean;
+  class?: string;
+}
+
+const {
+  reverse = false,
+  duration = 40,
+  gap = '2.5rem',
+  label,
+  focusable = true,
+  class: className = '',
+} = Astro.props;
+---
+
+<div
+  class:list={['marquee', reverse && 'marquee-reverse', className]}
+  style={`--marquee-duration:${duration}s;--marquee-gap:${gap}`}
+  role="group"
+  aria-label={label}
+  tabindex={focusable ? 0 : undefined}
+>
+  <div class="marquee-track">
+    <div class="marquee-group"><slot /></div>
+    <div class="marquee-group marquee-clone" aria-hidden="true" inert><slot /></div>
+  </div>
+</div>
+
+<style>
+  .marquee {
+    overflow: hidden;
+    -webkit-mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+    mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+  }
+
+  .marquee:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: -2px;
+  }
+
+  .marquee-track {
+    display: flex;
+    width: max-content;
+    animation: marquee-scroll var(--marquee-duration, 40s) linear infinite;
+    will-change: transform;
+  }
+
+  .marquee-reverse .marquee-track {
+    animation-direction: reverse;
+  }
+
+  .marquee-group {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    gap: var(--marquee-gap, 2.5rem);
+    /* trailing gap keeps both groups the same width so -50% loops seamlessly */
+    padding-right: var(--marquee-gap, 2.5rem);
+  }
+
+  .marquee:hover .marquee-track,
+  .marquee:focus-within .marquee-track {
+    animation-play-state: paused;
+  }
+
+  @keyframes marquee-scroll {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .marquee {
+      -webkit-mask-image: none;
+      mask-image: none;
+    }
+    .marquee-track {
+      animation: none !important;
+      width: auto;
+      justify-content: center;
+    }
+    .marquee-group {
+      flex-wrap: wrap;
+      justify-content: center;
+      row-gap: 1rem;
+      padding-inline: 1.5rem;
+    }
+    .marquee-clone {
+      display: none;
+    }
+  }
+</style>

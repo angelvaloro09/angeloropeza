@@ -1,0 +1,67 @@
+---
+import type { Lang } from '@/data/profile';
+import { profile } from '@/data/profile';
+
+interface Props {
+  size?: number | string;
+  class?: string;
+  lang?: Lang;
+}
+
+const {
+  size = 160,
+  class: className = '',
+  lang = 'es',
+} = Astro.props;
+
+const dimension = typeof size === 'number' ? `${size}px` : size;
+const altText = lang === 'es' ? `Retrato ilustrado de ${profile.name}` : `Illustrated portrait of ${profile.name}`;
+---
+
+<div
+  class:list={[
+    'avatar-container inline-block transition-transform duration-300 ease-out hover:-rotate-1 hover:scale-105',
+    className,
+  ]}
+  style={{ width: dimension, height: dimension }}
+>
+  <div class="avatar-frame w-full h-full rounded-[14px] overflow-hidden flex items-center justify-center">
+    <img
+      src="/brand/avatar-noanoa.jpeg"
+      alt={altText}
+      width={1211}
+      height={1211}
+      loading="eager"
+      decoding="async"
+      class="avatar-img w-full h-full object-cover"
+    />
+  </div>
+</div>
+
+<style>
+  .avatar-container {
+    transform: rotate(-3deg);
+  }
+
+  .avatar-frame {
+    background: transparent;
+    border: 1.5px solid transparent;
+    transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .avatar-img {
+    mix-blend-mode: multiply;
+  }
+
+  :global([data-theme='dark']) .avatar-frame {
+    background-color: #F7F5F0;
+    border-color: var(--ink);
+    box-shadow: 4px 4px 0 var(--ink);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .avatar-container {
+      transform: none !important;
+    }
+  }
+</style>

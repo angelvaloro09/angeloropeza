@@ -42,6 +42,10 @@
   --step-3: clamp(1.6rem, 1.2rem + 1.7vw, 2.5rem);
   --step-4: clamp(2rem, 1.3rem + 3vw, 4rem);
   --step-5: clamp(2.5rem, 1.4rem + 5vw, 6rem);
+
+  /* Section rhythm (360px -> 1440px): vertical padding and header gap. */
+  --section-y: clamp(4.5rem, 3rem + 6vw, 8rem);
+  --section-gap: clamp(2.5rem, 1.5rem + 4vw, 4rem);
 }
 
 :root[data-theme='dark'] {
@@ -85,6 +89,36 @@ body {
 
 .mono {
   font-family: 'JetBrains Mono', ui-monospace, monospace;
+}
+
+/* Section scale utilities (built on the --step-* tokens) */
+.section-y {
+  padding-block: var(--section-y);
+}
+.h-section { /* section h2 */
+  font-size: min(var(--step-5), 4.5rem);
+}
+.h-section-xl { /* Work h2 */
+  font-size: var(--step-5);
+}
+.h-case { /* case / index h3 */
+  font-size: min(var(--step-5), 3.75rem);
+}
+.h-card { /* card h3 */
+  font-size: var(--step-3);
+}
+.h-card-sm {
+  font-size: var(--step-2);
+}
+.h-contact {
+  font-size: min(var(--step-4), 3rem);
+}
+
+/* Touch target: >=44px hit area without changing the visual size of inline links */
+.tap {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
 }
 
 /* Components & Card Utilities */

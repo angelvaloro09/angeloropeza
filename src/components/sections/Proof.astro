@@ -18,7 +18,7 @@ const stats = [
 ];
 ---
 
-<section class="px-6 py-16 md:py-24" aria-labelledby="proof-heading">
+<section class="px-6 py-[calc(var(--section-y)*0.6)]" aria-labelledby="proof-heading">
   <div class="mx-auto max-w-7xl">
     <h2 id="proof-heading" class="sr-only">{copy.heading}</h2>
     <ul class="grid grid-cols-2 gap-x-5 gap-y-8 md:grid-cols-4 md:gap-x-8">
@@ -28,7 +28,7 @@ const stats = [
             class:list={['note proof-note p-5 md:p-7', s.soft && 'proof-note-soft']}
             style={`--r:${s.rot}`}
           >
-            <div class="display text-5xl font-bold md:text-7xl" data-count={s.value}>{s.value}</div>
+            <div class="display h-section font-bold" data-count={s.value}>{s.value}</div>
             <div class="mono mt-3 text-xs md:text-sm" style="color: var(--ink)">{s.label}</div>
           </div>
         </li>

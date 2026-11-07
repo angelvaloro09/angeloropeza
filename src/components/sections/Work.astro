@@ -39,11 +39,11 @@ const coverAlt = (p: Project) =>
   p.imageNote ? c.alt.comp(p.title, p.imageNote[lang]) : c.alt.screenshot(p.title);
 ---
 
-<section id="work" class="work relative mx-auto max-w-7xl px-6 py-32" aria-labelledby="work-title">
-  <header class="mb-24 grid items-end gap-8 md:grid-cols-12">
+<section id="work" class="work relative mx-auto max-w-7xl px-6 section-y" aria-labelledby="work-title">
+  <header class="mb-[calc(var(--section-gap)*1.5)] grid items-end gap-8 md:grid-cols-12">
     <div class="reveal relative md:col-span-8">
       <p class="mono mb-5 text-sm text-muted">{c.eyebrow}</p>
-      <h2 id="work-title" class="display text-5xl font-bold md:text-7xl lg:text-8xl">
+      <h2 id="work-title" class="display h-section-xl font-bold">
         {c.title.before}<span class="serif-accent relative inline-block font-normal">
           {c.title.accent}
           <Doodle kind="squiggle" class="absolute -bottom-3 left-0 w-full text-accent" />
@@ -55,7 +55,7 @@ const coverAlt = (p: Project) =>
   </header>
 
   <!-- Case blocks -->
-  <div class="flex flex-col gap-32 md:gap-44">
+  <div class="flex flex-col gap-[var(--section-y)]">
     {cases.map((p, i) => {
       const flip = i % 2 === 1;
       const [shotA, shotB] = p.images.shots;
@@ -149,7 +149,7 @@ const coverAlt = (p: Project) =>
 
           <div class:list={['reveal lg:col-span-5', flip ? 'lg:order-1' : 'lg:order-2']}>
             <p class="mono text-xs tracking-wide text-muted">{c.caseOf(pad(i + 1), pad(cases.length))}</p>
-            <h3 id={`case-${p.slug}`} class="display mt-3 text-5xl font-bold md:text-6xl">{p.title}</h3>
+            <h3 id={`case-${p.slug}`} class="display h-case mt-3 font-bold">{p.title}</h3>
 
             <p class="mono mt-5 text-sm text-muted">
               <span class="dot-sep">{kindOf(p)}</span><span>{p.year}</span>
@@ -201,9 +201,9 @@ const coverAlt = (p: Project) =>
   </div>
 
   <!-- Project index -->
-  <div class="mt-44">
+  <div class="mt-[var(--section-y)]">
     <div class="reveal relative mb-10 flex flex-wrap items-end justify-between gap-x-8 gap-y-3">
-      <h3 class="display text-4xl font-bold md:text-6xl">
+      <h3 class="display h-case font-bold">
         {c.index.title.before}<span class="serif-accent font-normal">{c.index.title.accent}</span>
       </h3>
       <Doodle kind="arrow" class="absolute -top-8 left-[58%] hidden w-14 rotate-[-12deg] text-ink md:block" />
@@ -511,7 +511,7 @@ const coverAlt = (p: Project) =>
 
   .idx-title {
     margin: 0;
-    font-size: clamp(2rem, 6vw, 4.25rem);
+    font-size: min(var(--step-5), 4.25rem);
     font-weight: 700;
     transition: color 0.2s ease, transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
   }

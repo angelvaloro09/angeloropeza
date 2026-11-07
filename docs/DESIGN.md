@@ -23,6 +23,9 @@ Old blue (`#1e6ef3`) is retired. Accent only for emphasis; never large fills exc
 - Display: **Space Grotesk** 700, tight tracking. Accent words in **Instrument Serif _italic_** (Halo-style sans+serif-italic pairing).
 - Body: **Inter** 400/500. Labels/meta: **JetBrains Mono** 400 (small, `.75–.875rem`).
 - Self-host or keep Google Fonts with `display=swap`; add Instrument Serif.
+- Breakpoints = Tailwind defaults, mobile-first (sm 640 · md 768 · lg 1024 · xl 1280 · 2xl 1536); verified at 360/390/412/768/1024/1440.
+- Fluid type: `--step--1 … --step-5` in `global.css`. Anything sized for the first view also caps by height: `min(<n>vw, <n>svh)`, with a `vh` fallback declared before it.
+- Hero + tech band form one `min-height: 100svh` block (`.hero-shell`), band pinned to the bottom; hero top padding = `--nav-h` + a small `svh` clamp.
 
 ### Signature devices (what makes it *this* portfolio)
 1. **Avatar sticker** — `public/brand/avatar-noanoa.jpeg`, `mix-blend-mode: multiply` on paper (light), framed in a paper-colored rounded "sticker" with ink border in dark. Slight rotation (-3°), hover wobble.

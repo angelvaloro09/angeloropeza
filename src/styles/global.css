@@ -1,31 +1,142 @@
 @import 'tailwindcss';
 
-:root {
-  --bg: #0a0d12;
-  --surface: #11161d;
-  --text: #e8ecf1;
-  --muted: #6a7681;
-  --accent: #1e6ef3;
-  --glow: #4d8fff;
-  --line: rgba(255, 255, 255, 0.08);
-}
-:root[data-theme='light'] {
-  --bg: #f6f8fb;
-  --surface: #ffffff;
-  --text: #0a0d12;
-  --muted: #5b6672;
-  --line: rgba(0, 0, 0, 0.1);
+@theme {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+
+  --font-display: 'Space Grotesk', system-ui, sans-serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --font-serif-accent: 'Instrument Serif', Georgia, serif;
 }
 
-html { background: var(--bg); color: var(--text); font-family: 'Inter', system-ui, sans-serif; scroll-behavior: auto; }
-body { margin: 0; }
-.display { font-family: 'Space Grotesk', 'Inter', sans-serif; letter-spacing: -0.04em; line-height: 0.95; }
-.mono { font-family: 'JetBrains Mono', ui-monospace, monospace; }
-.card { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; }
-.reveal { opacity: 0; transform: translateY(24px); }
-a:focus-visible, button:focus-visible { outline: 2px solid var(--glow); outline-offset: 3px; }
+:root {
+  --bg: #F7F5F0;
+  --surface: #FFFFFF;
+  --ink: #17171A;
+  --muted: #6B6760;
+  --line: rgba(23, 23, 26, 0.14);
+  --accent: #E0584A;
+  --accent-soft: #F7D9D3;
+  --accent-text: #C4402F; /* AA (4.6:1) on paper for small text */
+
+  /* Legacy aliases for backward compatibility */
+  --text: var(--ink);
+  --glow: var(--accent);
+}
+
+:root[data-theme='dark'] {
+  --bg: #141312;
+  --surface: #1D1B19;
+  --ink: #F2EEE6;
+  --muted: #9A958B;
+  --line: rgba(242, 238, 230, 0.14);
+  --accent: #F0705F;
+  --accent-soft: #3A211D;
+  --accent-text: #F0705F;
+
+  /* Legacy aliases for backward compatibility */
+  --text: var(--ink);
+  --glow: var(--accent);
+}
+
+html {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Inter', system-ui, sans-serif;
+  scroll-behavior: auto;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+}
+
+/* Typography Utilities */
+.display {
+  font-family: 'Space Grotesk', 'Inter', system-ui, sans-serif;
+  letter-spacing: -0.04em;
+  line-height: 0.95;
+}
+
+.serif-accent {
+  font-family: 'Instrument Serif', Georgia, serif;
+  font-style: italic;
+}
+
+.mono {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+}
+
+/* Components & Card Utilities */
+.note {
+  background: var(--surface);
+  border: 1.5px solid var(--ink);
+  border-radius: 14px;
+  box-shadow: 4px 4px 0 var(--ink);
+  transform: rotate(-1deg);
+  transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.2s ease;
+}
+
+.note:hover {
+  transform: rotate(0deg) translate(-2px, -2px);
+  box-shadow: 6px 6px 0 var(--ink);
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+}
+
+.dot-sep::after {
+  content: '·';
+  margin: 0 0.5rem;
+  color: var(--muted);
+}
+
+.marker {
+  background: linear-gradient(120deg, var(--accent-soft) 0%, var(--accent-soft) 100%);
+  background-repeat: no-repeat;
+  background-size: 100% 40%;
+  background-position: 0 88%;
+  padding: 0 2px;
+}
+
+.paper-grain {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
+
+/* Reveal & Motion */
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+}
+
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
 
 @media (prefers-reduced-motion: reduce) {
-  .reveal { opacity: 1; transform: none; }
-  * { animation: none !important; transition: none !important; }
+  .reveal {
+    opacity: 1;
+    transform: none;
+  }
+  .note {
+    transform: none !important;
+  }
+  .note:hover {
+    transform: none !important;
+  }
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
 }

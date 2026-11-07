@@ -2,7 +2,7 @@ import type { Lang } from '@/data/profile';
 
 export const ui = {
   es: {
-    nav: { work: 'Proyectos', stack: 'Stack', path: 'Trayectoria', contact: 'Contacto' },
+    nav: { work: 'Proyectos', backend: 'Backend', stack: 'Stack', path: 'Trayectoria', contact: 'Contacto' },
     hero: { cta: 'Ver proyectos', scroll: 'Desplázate' },
     work: 'Proyectos destacados',
     stack: 'Stack y expertise',
@@ -15,7 +15,7 @@ export const ui = {
     footer: 'Hecho con Astro',
   },
   en: {
-    nav: { work: 'Work', stack: 'Stack', path: 'Path', contact: 'Contact' },
+    nav: { work: 'Work', backend: 'Backend', stack: 'Stack', path: 'Path', contact: 'Contact' },
     hero: { cta: 'View work', scroll: 'Scroll' },
     work: 'Featured work',
     stack: 'Stack & expertise',

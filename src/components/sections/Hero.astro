@@ -1,24 +1,269 @@
 ---
-import { profile, projects, skills } from '@/data/profile';
-import { t } from '@/i18n/ui';
+import { profile, techList } from '@/data/profile';
 import type { Lang } from '@/data/profile';
-const { lang } = Astro.props as { lang: Lang };
-const tr = t(lang);
-const techCount = new Set(skills.flatMap((s) => s.items)).size;
----
-<section class="relative flex min-h-screen flex-col justify-center overflow-hidden px-6 pt-32">
-  <div aria-hidden="true" class="pointer-events-none absolute -right-40 top-1/4 h-[560px] w-[560px] rounded-full opacity-40 blur-3xl"
-       style="background: radial-gradient(circle, var(--accent), transparent 65%)"></div>
-  <div class="relative mx-auto w-full max-w-7xl">
-    <p class="mono mb-6 text-sm" style="color: var(--muted)">{profile.role[lang]} · {profile.location}</p>
-    <h1 class="display text-[clamp(3.5rem,13vw,11rem)] font-bold">{profile.name}</h1>
-    <p class="mt-8 max-w-2xl text-lg md:text-xl" style="color: var(--muted)">{profile.tagline[lang]}</p>
-    <a href="#work" class="mono mt-10 inline-block rounded-full px-7 py-3 text-sm text-white" style="background: var(--accent)">{tr.hero.cta} ↓</a>
+import { heroCopy } from '@/i18n/sections/hero';
+import Avatar from '@/components/ui/Avatar.astro';
+import Doodle from '@/components/ui/Doodle.astro';
+import Marquee from '@/components/ui/Marquee.astro';
+import TechIcon from '@/components/ui/TechIcon.astro';
 
-    <div class="mt-20 grid max-w-3xl grid-cols-3 gap-4">
-      <div class="card p-5"><div class="display text-4xl font-bold" data-count={projects.length}>{projects.length}</div><div class="mono mt-2 text-xs" style="color: var(--muted)">{tr.metrics.projects}</div></div>
-      <div class="card p-5"><div class="display text-4xl font-bold" data-count={techCount}>{techCount}</div><div class="mono mt-2 text-xs" style="color: var(--muted)">{tr.metrics.langs}</div></div>
-      <div class="card p-5"><div class="display text-4xl font-bold" data-count="2">2</div><div class="mono mt-2 text-xs" style="color: var(--muted)">{tr.metrics.years}</div></div>
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props as Props;
+const copy = heroCopy[lang];
+
+const [firstName, ...restName] = profile.name.split(' ');
+const lastName = restName.join(' ');
+
+// Marker highlight on one key phrase of the tagline (phrase lives in the i18n file).
+const tagline = profile.tagline[lang];
+const at = tagline.indexOf(copy.marker);
+const [before, marked, after] =
+  at >= 0
+    ? [tagline.slice(0, at), copy.marker, tagline.slice(at + copy.marker.length)]
+    : [tagline, '', ''];
+---
+
+<section data-hero class="relative overflow-x-clip px-6 pb-14 pt-28 md:pb-20 md:pt-36">
+  <div class="mx-auto grid max-w-7xl items-center gap-10 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] lg:gap-6">
+    <!-- Copy -->
+    <div class="relative">
+      <p data-hero-in class="mono mb-6 text-sm md:text-base" style="color: var(--muted)">
+        {profile.role[lang]}<span class="dot-sep"></span>{profile.location}
+      </p>
+
+      <h1 class="display font-bold" style="font-size: clamp(3.75rem, 12vw, 10rem)">
+        <span data-hero-in class="block">{firstName}</span>{' '}
+        {lastName && (
+          <span data-hero-in class="serif-accent block" style="font-weight:400;font-size:1.08em;letter-spacing:-0.02em;padding-left:0.08em">
+            {lastName}<span class="hero-dot" aria-hidden="true">.</span>
+          </span>
+        )}
+      </h1>
+
+      <p data-hero-in class="mt-8 max-w-xl text-lg leading-relaxed md:text-xl" style="color: var(--muted)">
+        {before}{marked && <span class="marker hero-marker" style="color: var(--ink)">{marked}</span>}{after}
+      </p>
+
+      <div data-hero-in class="mt-10 flex flex-wrap items-center gap-4">
+        <a href="#work" class="hero-cta hero-cta-primary mono">
+          {copy.ctaWork}<span aria-hidden="true"> ↓</span>
+        </a>
+        <a href="#contact" class="hero-cta hero-cta-secondary mono">
+          {copy.ctaContact}<span aria-hidden="true"> →</span>
+        </a>
+      </div>
+
+      <div data-hero-in class="mono mt-14 hidden items-center gap-3 text-xs md:flex" style="color: var(--muted)" aria-hidden="true">
+        <span class="hero-wheel"></span>
+        <span>{copy.scroll}</span>
+      </div>
+    </div>
+
+    <!-- Avatar + doodles -->
+    <div class="relative mx-auto w-full max-w-[26rem] pt-14 lg:-mr-8 lg:max-w-none">
+      <!-- hand-written greeting + arrow pointing at the avatar -->
+      <div data-hero-doodle class="absolute left-0 top-0 flex items-end gap-1 lg:left-4" aria-hidden="true">
+        <span class="serif-accent text-3xl md:text-4xl" style="color: var(--ink); transform: rotate(-6deg)">{copy.greeting}</span>
+        <Doodle kind="arrow" class="mb-1 h-8 w-12 rotate-[24deg]" />
+      </div>
+
+      <div data-hero-avatar class="ml-auto w-fit -rotate-2">
+        <Avatar size="clamp(15rem, 36vw, 27.5rem)" lang={lang} />
+      </div>
+
+      <div data-hero-doodle class="absolute right-0 top-6 text-accent lg:right-4" aria-hidden="true">
+        <Doodle kind="asterisk" class="h-10 w-10 rotate-12 md:h-14 md:w-14" />
+      </div>
+      <div data-hero-doodle class="absolute -bottom-4 left-4 lg:left-10" aria-hidden="true">
+        <Doodle kind="squiggle" class="h-5 w-28 -rotate-6 md:w-36" />
+      </div>
+      <div data-hero-doodle class="absolute -bottom-2 right-2 hidden md:block lg:right-8" aria-hidden="true">
+        <Doodle kind="asterisk" class="h-6 w-6 -rotate-12" />
+      </div>
     </div>
   </div>
 </section>
+
+<!-- Tech marquee: full-bleed band, pauses on hover / focus -->
+<div class="tech-band">
+  <Marquee label={copy.techLabel} duration={70} gap="3rem" class="py-5">
+    {techList.map((tech) => (
+      <span class="group tech-chip mono">
+        <TechIcon id={tech.id} size={24} mono />
+        <span>{tech.name}</span>
+      </span>
+    ))}
+  </Marquee>
+</div>
+
+<style>
+  .hero-dot {
+    color: var(--accent);
+  }
+
+  .hero-cta {
+    display: inline-flex;
+    align-items: center;
+    border: 1.5px solid var(--ink);
+    border-radius: 999px;
+    padding: 0.85rem 1.6rem;
+    font-size: 0.9rem;
+    line-height: 1;
+    transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.2s ease, background-color 0.2s ease;
+  }
+
+  .hero-cta-primary {
+    background: var(--ink);
+    color: var(--bg);
+    box-shadow: 4px 4px 0 var(--accent);
+  }
+
+  .hero-cta-primary:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0 var(--accent);
+  }
+
+  .hero-cta-primary:active {
+    transform: translate(3px, 3px);
+    box-shadow: 1px 1px 0 var(--accent);
+  }
+
+  .hero-cta-secondary {
+    background: transparent;
+    color: var(--ink);
+  }
+
+  .hero-cta-secondary:hover {
+    background: var(--surface);
+    transform: translate(-2px, -2px);
+    box-shadow: 4px 4px 0 var(--ink);
+  }
+
+  .hero-cta-secondary:active {
+    transform: translate(2px, 2px);
+    box-shadow: none;
+  }
+
+  /* scroll hint: tiny mouse wheel, looping translateY */
+  .hero-wheel {
+    position: relative;
+    display: inline-block;
+    width: 22px;
+    height: 34px;
+    border: 1.5px solid var(--ink);
+    border-radius: 12px;
+  }
+
+  .hero-wheel::after {
+    content: '';
+    position: absolute;
+    top: 6px;
+    left: 50%;
+    width: 3px;
+    height: 7px;
+    margin-left: -1.5px;
+    border-radius: 2px;
+    background: var(--ink);
+    animation: hero-wheel 1.8s ease-in-out infinite;
+  }
+
+  @keyframes hero-wheel {
+    0% {
+      transform: translateY(0);
+      opacity: 1;
+    }
+    60% {
+      transform: translateY(11px);
+      opacity: 0;
+    }
+    61% {
+      transform: translateY(0);
+      opacity: 0;
+    }
+    100% {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  /* tech marquee band */
+  .tech-band {
+    border-block: 1.5px solid var(--ink);
+    background: var(--surface);
+  }
+
+  .tech-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.65rem;
+    white-space: nowrap;
+    font-size: 0.875rem;
+    color: var(--ink);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero-wheel::after {
+      animation: none;
+    }
+    .hero-cta {
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  import gsap from 'gsap';
+
+  function initHero() {
+    const root = document.querySelector<HTMLElement>('[data-hero]');
+    if (!root || root.dataset.heroInit === '1') return;
+    root.dataset.heroInit = '1';
+
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    const items = root.querySelectorAll<HTMLElement>('[data-hero-in]');
+    const avatar = root.querySelector<HTMLElement>('[data-hero-avatar]');
+    const doodles = root.querySelectorAll<HTMLElement>('[data-hero-doodle]');
+    const marker = root.querySelector<HTMLElement>('.hero-marker');
+
+    const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
+
+    tl.from(items, {
+      y: 40,
+      opacity: 0,
+      duration: 0.9,
+      stagger: 0.12,
+      clearProps: 'transform,opacity',
+    });
+
+    if (avatar) {
+      // settles from a slight extra rotation; the resting tilt comes from CSS (`rotate`)
+      tl.from(
+        avatar,
+        { rotation: 7, y: 30, opacity: 0, duration: 1.1, ease: 'back.out(1.4)', clearProps: 'transform,opacity' },
+        0.25,
+      );
+    }
+
+    if (doodles.length) {
+      tl.from(
+        doodles,
+        { scale: 0, opacity: 0, duration: 0.5, stagger: 0.12, ease: 'back.out(2)', clearProps: 'transform,opacity' },
+        0.9,
+      );
+    }
+
+    if (marker) {
+      tl.fromTo(
+        marker,
+        { backgroundSize: '0% 40%' },
+        { backgroundSize: '100% 40%', duration: 0.7, ease: 'power2.out', clearProps: 'backgroundSize' },
+        1.0,
+      );
+    }
+  }
+
+  document.addEventListener('astro:page-load', initHero);
+</script>

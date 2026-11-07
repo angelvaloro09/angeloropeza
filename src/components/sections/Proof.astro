@@ -1,0 +1,57 @@
+---
+import { projects, techList } from '@/data/profile';
+import type { Lang } from '@/data/profile';
+import { heroCopy } from '@/i18n/sections/hero';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props as Props;
+const copy = heroCopy[lang].proof;
+
+// Every number is derived from the data files; nothing is hand-typed.
+const stats = [
+  { value: projects.length, label: copy.projects, rot: '-1.2deg', soft: false },
+  { value: projects.filter((p) => p.client).length, label: copy.freelance, rot: '0.9deg', soft: true },
+  { value: techList.length, label: copy.tech, rot: '-0.5deg', soft: false },
+  { value: projects.filter((p) => p.links.repo).length, label: copy.repos, rot: '1.4deg', soft: false },
+];
+---
+
+<section class="px-6 py-16 md:py-24" aria-labelledby="proof-heading">
+  <div class="mx-auto max-w-7xl">
+    <h2 id="proof-heading" class="sr-only">{copy.heading}</h2>
+    <ul class="grid grid-cols-2 gap-x-5 gap-y-8 md:grid-cols-4 md:gap-x-8">
+      {stats.map((s) => (
+        <li>
+          <div
+            class:list={['note proof-note p-5 md:p-7', s.soft && 'proof-note-soft']}
+            style={`--r:${s.rot}`}
+          >
+            <div class="display text-5xl font-bold md:text-7xl" data-count={s.value}>{s.value}</div>
+            <div class="mono mt-3 text-xs md:text-sm" style="color: var(--ink)">{s.label}</div>
+          </div>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .proof-note.note {
+    transform: rotate(var(--r, -1deg));
+  }
+  .proof-note.note:hover {
+    transform: rotate(0deg) translate(-2px, -2px);
+  }
+  .proof-note-soft.note {
+    background: var(--accent-soft);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .proof-note.note,
+    .proof-note.note:hover {
+      transform: none;
+    }
+  }
+</style>

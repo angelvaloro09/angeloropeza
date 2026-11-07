@@ -1,0 +1,101 @@
+---
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+
+interface Props {
+  image: ImageMetadata;
+  alt: string;
+  /** Text shown in the address pill (never a made-up URL: use the project name). */
+  address?: string;
+  widths?: number[];
+  sizes?: string;
+  loading?: 'lazy' | 'eager';
+  class?: string;
+}
+
+const {
+  image,
+  alt,
+  address,
+  widths = [640, 960, 1280],
+  sizes = '(min-width: 1024px) 720px, 100vw',
+  loading = 'lazy',
+  class: className = '',
+} = Astro.props;
+
+const hasAddress = Boolean(address) || Astro.slots.has('address');
+---
+
+<div class:list={['bf', className]}>
+  <div class="bf-bar" aria-hidden="true">
+    <span class="bf-dot bf-dot-accent"></span>
+    <span class="bf-dot"></span>
+    <span class="bf-dot"></span>
+    {hasAddress && (
+      <span class="bf-address mono"><slot name="address">{address}</slot></span>
+    )}
+  </div>
+  <Image
+    src={image}
+    alt={alt}
+    widths={widths}
+    sizes={sizes}
+    loading={loading}
+    decoding="async"
+    class="bf-img"
+  />
+</div>
+
+<style>
+  .bf {
+    overflow: hidden;
+    background: var(--surface);
+    border: 1.5px solid var(--ink);
+    border-radius: 14px;
+    box-shadow: 6px 6px 0 var(--ink);
+  }
+
+  .bf-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.5rem 0.75rem;
+    background: var(--bg);
+    border-bottom: 1.5px solid var(--ink);
+  }
+
+  .bf-dot {
+    width: 0.65rem;
+    height: 0.65rem;
+    border: 1.5px solid var(--ink);
+    border-radius: 999px;
+  }
+
+  .bf-dot-accent {
+    background: var(--accent);
+  }
+
+  .bf-address {
+    margin-left: 0.6rem;
+    min-width: 0;
+    max-width: 70%;
+    overflow: hidden;
+    padding: 0.1rem 0.7rem;
+    font-size: 0.7rem;
+    line-height: 1.5;
+    color: var(--muted);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+  }
+
+  .bf :global(.bf-img) {
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+    object-position: top;
+  }
+</style>

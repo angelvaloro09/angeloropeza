@@ -1,0 +1,212 @@
+---
+/**
+ * Typographic "cover card" for projects that have no real screenshot.
+ * Paper surface, ink border, big display title, kind in mono, a hand-drawn
+ * composition per slug and the tech icons. 16:10 like the real covers.
+ */
+import Doodle from '@/components/ui/Doodle.astro';
+import TechIcon from '@/components/ui/TechIcon.astro';
+import type { TechId } from '@/data/stack';
+
+interface Props {
+  slug: string;
+  title: string;
+  kind: string;
+  stack?: TechId[];
+  /** Hide from assistive tech when a visible heading already names the project. */
+  decorative?: boolean;
+  class?: string;
+}
+
+const { slug, title, kind, stack = [], decorative = false, class: className = '' } = Astro.props;
+
+const titleSize: Record<string, string> = {
+  'isca-epm': '12.5cqi',
+  passwords: '11cqi',
+  sun: '25cqi',
+};
+
+// Sun: hand-jittered rays (deterministic, so the build is stable).
+const jitter = (i: number, k: number) => Math.sin(i * 12.9898 + k * 78.233) * 0.5;
+const rays = Array.from({ length: 14 }, (_, i) => {
+  const a = (i / 14) * Math.PI * 2 + jitter(i, 1) * 0.08;
+  const long = i % 2 === 0;
+  const r1 = 31 + jitter(i, 2) * 3;
+  const r2 = (long ? 53 : 42) + jitter(i, 3) * 4;
+  const f = (n: number) => n.toFixed(1);
+  return `M ${f(100 + Math.cos(a) * r1)},${f(60 + Math.sin(a) * r1)} L ${f(100 + Math.cos(a) * r2)},${f(60 + Math.sin(a) * r2)}`;
+});
+---
+
+<div
+  class:list={['pa', className]}
+  data-slug={slug}
+  aria-hidden={decorative ? 'true' : undefined}
+  role={decorative ? undefined : 'img'}
+  aria-label={decorative ? undefined : `${title} — ${kind}`}
+  style={`--pa-title:${titleSize[slug] ?? '11cqi'}`}
+>
+  <p class="pa-kind mono">{kind}</p>
+
+  <svg class="pa-art" viewBox="0 0 200 120" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    {slug === 'isca-epm' && (
+      <>
+        <path d="M 8,12 C 24,10 40,11 56,10 C 57,18 57,28 56,38 C 40,40 24,39 8,38 C 7,30 7,20 8,12" />
+        <path d="M 16,20 C 24,19 32,20 40,19" />
+        <path d="M 16,29 C 22,28 28,29 34,28" />
+        <path d="M 77,11 C 93,9 109,10 125,11 C 126,19 126,28 125,37 C 109,39 93,38 77,39 C 76,30 76,20 77,11" stroke="var(--accent)" />
+        <path d="M 85,20 C 94,19 102,20 110,19" />
+        <path d="M 85,29 C 91,28 97,29 103,28" />
+        <path d="M 150,14 C 150,7 190,7 190,14 C 190,21 150,21 150,14" />
+        <path d="M 150,14 C 150,22 150,30 150,38 C 150,45 190,45 190,38 C 190,30 190,22 190,14" />
+        <path d="M 150,26 C 150,33 190,33 190,26" />
+        <path d="M 77,78 C 93,76 109,77 125,78 C 126,86 126,95 125,104 C 109,106 93,105 77,106 C 76,97 76,87 77,78" />
+        <path d="M 86,91 C 94,90 102,91 112,90" />
+        <path d="M 59,25 C 64,24 70,26 75,25" />
+        <path d="M 70,20 C 73,22 75,24 76,25 C 74,27 72,29 69,31" />
+        <path d="M 128,25 C 134,24 142,26 148,25" />
+        <path d="M 142,20 C 145,22 147,24 149,25 C 147,27 145,29 142,31" />
+        <path d="M 101,41 C 100,52 102,64 101,75" />
+        <path d="M 96,68 C 98,71 100,73 101,76 C 103,73 105,71 107,68" />
+        <path d="M 127,92 C 148,91 168,80 170,50" stroke-dasharray="1 7" />
+        <path d="M 165,56 C 167,53 169,51 170,48 C 172,51 174,54 176,57" />
+      </>
+    )}
+
+    {slug === 'passwords' && (
+      <>
+        <path d="M 30,60 C 30,44 40,33 54,33 C 69,33 79,44 79,60 C 79,76 69,87 54,87 C 40,87 30,76 30,60" />
+        <path d="M 46,60 C 46,54 49,50 54,50 C 59,50 63,54 63,60 C 63,66 59,70 54,70 C 49,70 46,66 46,60" />
+        <path d="M 79,60 C 105,59 140,61 176,60" />
+        <path d="M 176,60 C 177,66 177,72 176,78" />
+        <path d="M 150,60 C 151,68 151,75 150,82" />
+        <path d="M 126,60 C 127,66 127,71 126,76" />
+        <path d="M 28,108 C 60,106 100,107 150,108" stroke-dasharray="1 9" />
+        <circle cx="106" cy="94" r="2.6" fill="currentColor" stroke="none" />
+        <circle cx="119" cy="94" r="2.6" fill="currentColor" stroke="none" />
+        <circle cx="132" cy="94" r="2.6" fill="currentColor" stroke="none" />
+        <circle cx="145" cy="94" r="2.6" fill="currentColor" stroke="none" />
+        <circle cx="158" cy="94" r="2.6" fill="currentColor" stroke="none" />
+      </>
+    )}
+
+    {slug === 'sun' && (
+      <>
+        <path d="M 82,60 C 82,49 90,42 100,42 C 111,42 118,50 118,60 C 118,71 110,78 100,78 C 89,78 82,70 82,60" stroke="var(--accent)" />
+        {rays.map((d) => <path d={d} />)}
+      </>
+    )}
+
+    {!['isca-epm', 'passwords', 'sun'].includes(slug) && (
+      <>
+        <path d="M 10,30 C 40,18 70,40 100,28 C 130,16 160,38 190,26" />
+        <path d="M 20,60 C 50,48 80,70 110,58 C 140,46 170,68 190,56" />
+        <path d="M 14,92 C 44,80 74,102 104,90 C 134,78 164,100 188,88" />
+      </>
+    )}
+  </svg>
+
+  {slug === 'isca-epm' && <Doodle kind="arrow" class="pa-d absolute right-[5cqi] bottom-[19cqi] w-[10cqi] rotate-[18deg]" />}
+  {slug === 'passwords' && <Doodle kind="asterisk" class="pa-d absolute right-[6cqi] bottom-[18cqi] w-[7cqi] text-accent" />}
+  {slug === 'sun' && <Doodle kind="scribble" class="pa-d absolute right-[6cqi] bottom-[7cqi] w-[18cqi]" />}
+
+  <div class="pa-bottom">
+    <h3 class="pa-title display">
+      <span class="pa-title-text">
+        {title}
+        <Doodle kind="underline" stroke="var(--accent)" class="pa-underline absolute left-0 w-full" />
+      </span>
+    </h3>
+    {stack.length > 0 && (
+      <ul class="pa-icons">
+        {stack.map((id) => (
+          <li class="group"><TechIcon id={id} size={20} mono /></li>
+        ))}
+      </ul>
+    )}
+  </div>
+</div>
+
+<style>
+  .pa {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    container-type: inline-size;
+    overflow: hidden;
+    color: var(--ink);
+    background-color: var(--surface);
+    background-image: radial-gradient(circle, var(--line) 1px, transparent 1.6px);
+    background-size: 14px 14px;
+    border: 1.5px solid var(--ink);
+    border-radius: 14px;
+  }
+
+  .pa-kind {
+    position: absolute;
+    top: 5cqi;
+    left: 5.5cqi;
+    right: 52cqi;
+    margin: 0;
+    font-size: max(9px, 2.7cqi);
+    line-height: 1.35;
+    color: var(--muted);
+  }
+
+  .pa-art {
+    position: absolute;
+    top: 7cqi;
+    right: 5cqi;
+    width: 44cqi;
+    height: auto;
+  }
+
+  .pa-bottom {
+    position: absolute;
+    left: 5.5cqi;
+    right: 5.5cqi;
+    bottom: 5cqi;
+    z-index: 1;
+  }
+
+  .pa-title {
+    margin: 0;
+    font-size: var(--pa-title);
+    font-weight: 700;
+    line-height: 0.98;
+    text-wrap: balance;
+    max-width: 62cqi;
+  }
+
+  .pa-title-text {
+    position: relative;
+    display: inline-block;
+    padding-bottom: 1.2cqi;
+  }
+
+  .pa-title-text :global(.pa-underline) {
+    bottom: -2.6cqi;
+    height: auto;
+    opacity: 0.9;
+  }
+
+  .pa-icons {
+    display: flex;
+    gap: 2.2cqi;
+    margin: 3.2cqi 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  @container (max-width: 279px) {
+    .pa-icons {
+      display: none;
+    }
+  }
+
+  @container (max-width: 199px) {
+    .pa-title-text :global(.pa-underline) {
+      display: none;
+    }
+  }
+</style>

@@ -32,7 +32,7 @@ const currentYear = new Date().getFullYear();
     <div class="contact-email-group group inline-block max-w-full">
       <a
         href={`mailto:${profile.email}`}
-        class="contact-email-link display block font-bold text-[clamp(1.25rem,6.4vw,5.5rem)] text-[var(--ink)] tracking-tight break-words break-all sm:break-normal transition-colors duration-200 group-hover:text-[var(--accent)] focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-4"
+        class="contact-email-link display block py-3 font-bold text-[clamp(1.25rem,6.4vw,5.5rem)] text-[var(--ink)] tracking-tight break-words break-all sm:break-normal transition-colors duration-200 group-hover:text-[var(--accent)] focus-visible:outline-2 focus-visible:outline-[var(--accent)] focus-visible:outline-offset-4"
       >
         {profile.email}
       </a>
@@ -106,7 +106,7 @@ const currentYear = new Date().getFullYear();
     <div class="relative self-start md:self-auto flex items-center gap-4 pt-2">
       <div class="relative">
         <!-- Hand-drawn arrow doodle pointing to avatar/socials -->
-        <div class="absolute -top-7 -left-7 pointer-events-none" aria-hidden="true">
+        <div class="absolute -top-7 -left-5 sm:-left-7 pointer-events-none" aria-hidden="true">
           <Doodle kind="arrow" stroke="var(--accent)" class="w-8 h-6 -rotate-12" />
         </div>
 

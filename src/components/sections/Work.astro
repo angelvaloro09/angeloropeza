@@ -369,6 +369,7 @@ const coverAlt = (p: Project) =>
     display: inline-flex;
     align-items: center;
     gap: 0.4rem;
+    min-height: 44px; /* touch target */
     padding: 0.6rem 1.2rem;
     font-family: 'JetBrains Mono', ui-monospace, monospace;
     font-size: 0.8125rem;
@@ -532,6 +533,10 @@ const coverAlt = (p: Project) =>
     gap: 0.5rem 1rem;
   }
   .idx-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3em;
+    min-height: 44px; /* touch target */
     font-size: 0.8125rem;
     color: var(--ink);
     text-decoration: underline;

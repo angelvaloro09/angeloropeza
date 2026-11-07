@@ -25,15 +25,16 @@ const [before, marked, after] =
     : [tagline, '', ''];
 ---
 
-<section data-hero class="relative overflow-x-clip px-6 pb-14 pt-28 md:pb-20 md:pt-36">
-  <div class="mx-auto grid max-w-7xl items-center gap-10 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] lg:gap-6">
+<div class="hero-shell">
+<section data-hero class="hero relative overflow-x-clip px-6">
+  <div class="hero-grid mx-auto grid w-full max-w-7xl items-center">
     <!-- Copy -->
     <div class="relative">
-      <p data-hero-in class="mono mb-6 text-sm md:text-base" style="color: var(--muted)">
+      <p data-hero-in class="hero-role mono text-sm md:text-base" style="color: var(--muted)">
         {profile.role[lang]}<span class="dot-sep"></span>{profile.location}
       </p>
 
-      <h1 class="display font-bold" style="font-size: clamp(3.75rem, 12vw, 10rem)">
+      <h1 class="hero-title display font-bold">
         <span data-hero-in class="block">{firstName}</span>{' '}
         {lastName && (
           <span data-hero-in class="serif-accent block" style="font-weight:400;font-size:1.08em;letter-spacing:-0.02em;padding-left:0.08em">
@@ -42,11 +43,11 @@ const [before, marked, after] =
         )}
       </h1>
 
-      <p data-hero-in class="mt-8 max-w-xl text-lg leading-relaxed md:text-xl" style="color: var(--muted)">
+      <p data-hero-in class="hero-tagline max-w-xl leading-relaxed" style="color: var(--muted)">
         {before}{marked && <span class="marker hero-marker" style="color: var(--ink)">{marked}</span>}{after}
       </p>
 
-      <div data-hero-in class="mt-10 flex flex-wrap items-center gap-4">
+      <div data-hero-in class="hero-actions flex flex-wrap items-center gap-4">
         <a href="#work" class="hero-cta hero-cta-primary mono">
           {copy.ctaWork}<span aria-hidden="true"> ↓</span>
         </a>
@@ -55,14 +56,14 @@ const [before, marked, after] =
         </a>
       </div>
 
-      <div data-hero-in class="mono mt-14 hidden items-center gap-3 text-xs md:flex" style="color: var(--muted)" aria-hidden="true">
+      <div data-hero-in class="hero-scroll mono hidden items-center gap-3 text-xs md:flex" style="color: var(--muted)" aria-hidden="true">
         <span class="hero-wheel"></span>
         <span>{copy.scroll}</span>
       </div>
     </div>
 
     <!-- Avatar + doodles -->
-    <div class="relative mx-auto w-full max-w-[26rem] pt-14 lg:-mr-8 lg:max-w-none">
+    <div class="hero-art relative mx-auto w-full lg:-mr-8">
       <!-- hand-written greeting + arrow pointing at the avatar -->
       <div data-hero-doodle class="absolute left-0 top-0 flex items-end gap-1 lg:left-4" aria-hidden="true">
         <span class="serif-accent text-3xl md:text-4xl" style="color: var(--ink); transform: rotate(-6deg)">{copy.greeting}</span>
@@ -70,7 +71,7 @@ const [before, marked, after] =
       </div>
 
       <div data-hero-avatar class="ml-auto w-fit -rotate-2">
-        <Avatar size="clamp(15rem, 36vw, 27.5rem)" lang={lang} />
+        <Avatar size="var(--hero-avatar)" lang={lang} />
       </div>
 
       <div data-hero-doodle class="absolute right-0 top-6 text-accent lg:right-4" aria-hidden="true">
@@ -97,8 +98,88 @@ const [before, marked, after] =
     ))}
   </Marquee>
 </div>
+</div>
 
 <style>
+  /* Hero + tech band = one block that always fills the first viewport (svh = small viewport,
+     so mobile browser chrome never pushes content out). Band is pinned to the bottom. */
+  .hero-shell {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    min-height: 100svh;
+  }
+
+  .hero {
+    flex: 1 0 auto;
+    display: flex;
+    align-items: center;
+    padding-top: calc(var(--nav-h) + clamp(0.25rem, 2svh, 2.5rem));
+    padding-bottom: clamp(1.5rem, 4svh, 4rem);
+    /* avatar scales with the smaller of width / height so it never outgrows the first view */
+    --hero-avatar: clamp(8rem, min(62vw, 28vh), 27.5rem);
+    --hero-avatar: clamp(8rem, min(62vw, 28svh), 27.5rem);
+  }
+
+  .hero-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: clamp(0.5rem, 3svh, 2.5rem);
+  }
+
+  .hero-role {
+    margin-bottom: clamp(0.75rem, 2.5svh, 1.5rem);
+  }
+
+  .hero-title {
+    font-size: clamp(2.75rem, min(12vw, 15vh), 10rem);
+    font-size: clamp(2.75rem, min(12vw, 15svh), 10rem);
+  }
+
+  .hero-tagline {
+    margin-top: clamp(0.75rem, 3svh, 2rem);
+    font-size: var(--step-1);
+  }
+
+  .hero-actions {
+    margin-top: clamp(1rem, 3.5svh, 2.5rem);
+  }
+
+  .hero-scroll {
+    margin-top: clamp(1.5rem, 5svh, 3.5rem);
+  }
+
+  .hero-art {
+    max-width: 26rem;
+    padding-top: clamp(2.25rem, 6svh, 3.5rem);
+  }
+
+  /* short portrait phones (e.g. 360x640): spend less height on the avatar so the band peeks in */
+  @media (max-height: 700px) and (max-width: 639px) {
+    .hero {
+      --hero-avatar: clamp(8rem, min(62vw, 23vh), 27.5rem);
+      --hero-avatar: clamp(8rem, min(62vw, 23svh), 27.5rem);
+    }
+    .hero-art {
+      padding-top: 2rem;
+    }
+  }
+
+  /* two columns: desktop width, or landscape phones (wide but short) */
+  @media (min-width: 1024px), (min-width: 640px) and (max-height: 520px) and (orientation: landscape) {
+    .hero-grid {
+      grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+      column-gap: 1.5rem;
+    }
+    .hero-art {
+      max-width: none;
+    }
+    .hero {
+      --hero-avatar: clamp(8rem, min(36vw, 48vh), 27.5rem);
+      --hero-avatar: clamp(8rem, min(36vw, 48svh), 27.5rem);
+    }
+  }
+
+  .hero-dot {
   .hero-dot {
     color: var(--accent);
   }

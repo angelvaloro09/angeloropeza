@@ -4,6 +4,7 @@ import icon from 'astro-icon';
 import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
+  site: 'https://angeloropeza.me',
   integrations: [mdx(), icon()],
   i18n: {
     defaultLocale: 'es',

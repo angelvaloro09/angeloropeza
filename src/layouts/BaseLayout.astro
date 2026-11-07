@@ -9,6 +9,9 @@ interface Props { lang: Lang; title?: string; }
 const { lang, title = `${profile.name} — ${profile.role[lang]}` } = Astro.props;
 const tr = t(lang);
 const alt = other(lang);
+const site = Astro.site ?? new URL('https://angeloropeza.me');
+const canonical = new URL(Astro.url.pathname, site).href;
+const ogImage = new URL('/brand/avatar-noanoa.jpeg', site).href;
 ---
 <!doctype html>
 <html lang={lang}>
@@ -17,6 +20,18 @@ const alt = other(lang);
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={profile.tagline[lang]} />
     <title>{title}</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="canonical" href={canonical} />
+    <link rel="alternate" hreflang="es" href={new URL('/es/', site).href} />
+    <link rel="alternate" hreflang="en" href={new URL('/en/', site).href} />
+    <link rel="alternate" hreflang="x-default" href={new URL('/es/', site).href} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={profile.tagline[lang]} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:locale" content={lang === 'es' ? 'es_MX' : 'en_US'} />
+    <meta name="twitter:card" content="summary" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@1&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet" />

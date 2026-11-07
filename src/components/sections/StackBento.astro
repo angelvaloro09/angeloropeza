@@ -1,0 +1,175 @@
+---
+import { projects } from '@/data/projects';
+import { stackGroups, techList, type GroupId, type TechId } from '@/data/stack';
+import type { Lang } from '@/data/profile';
+import Doodle, { type DoodleKind } from '@/components/ui/Doodle.astro';
+import TechIcon from '@/components/ui/TechIcon.astro';
+import { stackBentoCopy } from '@/i18n/sections/stackBento';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const c = stackBentoCopy[lang];
+
+// Derived from the project data: how many projects list each technology.
+const usage = new Map<TechId, number>();
+for (const p of projects) for (const id of p.stack) usage.set(id, (usage.get(id) ?? 0) + 1);
+
+const groupIds = Object.keys(stackGroups) as GroupId[];
+const doodles: Record<GroupId, DoodleKind> = {
+  fullstack: 'asterisk',
+  backend: 'squiggle',
+  systems: 'scribble',
+  mobile: 'arrow',
+  tools: 'underline',
+};
+const doodleSize: Record<GroupId, string> = {
+  fullstack: 'w-9',
+  backend: 'w-16',
+  systems: 'w-20',
+  mobile: 'w-11',
+  tools: 'w-16',
+};
+const rotations: Record<GroupId, string> = {
+  fullstack: '-0.5deg',
+  backend: '0.5deg',
+  systems: '0.4deg',
+  mobile: '-0.4deg',
+  tools: '0.3deg',
+};
+
+const groups = groupIds.map((id) => ({
+  id,
+  title: stackGroups[id][lang],
+  items: techList.filter((t) => t.group === id).map((t) => ({ ...t, count: usage.get(t.id) ?? 0 })),
+}));
+---
+
+<section id="stack" class="stack mx-auto max-w-7xl px-6 py-32" aria-labelledby="stack-title">
+  <header class="mb-16 grid items-end gap-8 md:grid-cols-12">
+    <div class="reveal relative md:col-span-8">
+      <p class="mono mb-5 text-sm text-muted">{c.eyebrow}</p>
+      <h2 id="stack-title" class="display text-5xl font-bold md:text-7xl">
+        {c.title.before}<span class="serif-accent relative inline-block font-normal">
+          {c.title.accent}
+          <Doodle kind="underline" class="absolute -bottom-2 left-0 w-full text-accent" />
+        </span>
+      </h2>
+    </div>
+    <p class="reveal text-lg leading-relaxed text-muted md:col-span-4">{c.intro}</p>
+  </header>
+
+  <div class="bento">
+    {groups.map((g) => (
+      <article class="note bento-card" data-g={g.id} style={`--r:${rotations[g.id]}`} aria-labelledby={`stack-${g.id}`}>
+        <div class="flex items-start justify-between gap-4">
+          <h3 id={`stack-${g.id}`} class="display text-2xl font-bold md:text-3xl">{g.title}</h3>
+          <Doodle kind={doodles[g.id]} class:list={['mt-1 shrink-0 text-ink', doodleSize[g.id]]} />
+        </div>
+
+        <ul class="techs">
+          {g.items.map((t) => (
+            <li class="tech group">
+              <TechIcon id={t.id} size={28} />
+              <span class="tech-text">
+                <span class="tech-name">{t.name}</span>
+                {t.count > 0 && <span class="tech-count mono">{c.projectCount(t.count)}</span>}
+              </span>
+            </li>
+          ))}
+        </ul>
+      </article>
+    ))}
+  </div>
+</section>
+
+<style>
+  .stack {
+    overflow-x: clip;
+  }
+
+  .bento {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.5rem;
+  }
+
+  .bento-card {
+    display: flex;
+    flex-direction: column;
+    gap: 1.75rem;
+    padding: 1.5rem;
+    transform: rotate(var(--r));
+  }
+  .bento-card:hover {
+    transform: rotate(0deg) translate(-2px, -2px);
+  }
+
+  .techs {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(7.5rem, 1fr));
+    gap: 1.1rem 1rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .tech {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    min-width: 0;
+    transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  .tech:hover {
+    transform: translateY(-2px);
+  }
+
+  .tech-text {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+  .tech-name {
+    font-size: 0.9375rem;
+    font-weight: 500;
+    line-height: 1.25;
+  }
+  .tech-count {
+    margin-top: 0.1rem;
+    font-size: 0.7rem;
+    line-height: 1.3;
+    color: var(--muted);
+  }
+
+  @media (min-width: 768px) {
+    .bento {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-areas:
+        'full full'
+        'back sys'
+        'back mob'
+        'tools tools';
+    }
+    .bento-card {
+      padding: 1.75rem;
+    }
+    .bento-card[data-g='fullstack'] { grid-area: full; }
+    .bento-card[data-g='backend'] { grid-area: back; }
+    .bento-card[data-g='systems'] { grid-area: sys; }
+    .bento-card[data-g='mobile'] { grid-area: mob; }
+    .bento-card[data-g='tools'] { grid-area: tools; }
+  }
+
+  @media (min-width: 1024px) {
+    .bento {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-areas:
+        'full full back'
+        'sys mob back'
+        'tools tools tools';
+    }
+  }
+</style>

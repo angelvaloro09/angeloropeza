@@ -25,6 +25,7 @@ Old blue (`#1e6ef3`) is retired. Accent only for emphasis; never large fills exc
 - Self-host or keep Google Fonts with `display=swap`; add Instrument Serif.
 - Breakpoints = Tailwind defaults, mobile-first (sm 640 · md 768 · lg 1024 · xl 1280 · 2xl 1536); verified at 360/390/412/768/1024/1440.
 - Fluid type: `--step--1 … --step-5` in `global.css`. Anything sized for the first view also caps by height: `min(<n>vw, <n>svh)`, with a `vh` fallback declared before it.
+- Sections (non-hero): vertical rhythm `--section-y` / `--section-gap`; headings `.h-section` (h2), `.h-case` (case/index h3), `.h-card`/`.h-card-sm` (card h3), `.h-contact`. Interactive links/buttons keep a ≥44px hit area (`min-height: 44px`).
 - Hero + tech band form one `min-height: 100svh` block (`.hero-shell`), band pinned to the bottom; hero top padding = `--nav-h` + a small `svh` clamp.
 
 ### Signature devices (what makes it *this* portfolio)

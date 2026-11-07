@@ -18,11 +18,11 @@ const rotations = ['-0.8deg', '0.7deg', '0.5deg', '-0.6deg', '0.9deg', '-0.4deg'
 const pad = (n: number) => String(n).padStart(2, '0');
 ---
 
-<section id="backend" class="backend mx-auto max-w-7xl px-6 py-32" aria-labelledby="backend-title">
-  <header class="mb-16 grid items-end gap-8 md:grid-cols-12">
+<section id="backend" class="backend mx-auto max-w-7xl px-6 section-y" aria-labelledby="backend-title">
+  <header class="mb-[var(--section-gap)] grid items-end gap-8 md:grid-cols-12">
     <div class="reveal relative md:col-span-8">
       <p class="mono mb-5 text-sm text-muted">{c.eyebrow}</p>
-      <h2 id="backend-title" class="display text-5xl font-bold md:text-7xl">
+      <h2 id="backend-title" class="display h-section font-bold">
         {c.title.before}<span class="serif-accent relative inline-block font-normal">
           {c.title.accent}
           <Doodle kind="squiggle" class="absolute -bottom-3 left-0 w-full text-accent" />
@@ -44,7 +44,7 @@ const pad = (n: number) => String(n).padStart(2, '0');
             {p.client && <span class="bk-tag mono">Freelance</span>}
           </div>
 
-          <h3 id={`bk-${p.slug}`} class="display mt-4 text-3xl font-bold md:text-4xl">{p.title}</h3>
+          <h3 id={`bk-${p.slug}`} class="display h-card mt-4 font-bold">{p.title}</h3>
           <p class="mt-4 leading-relaxed text-muted">{p.summary[lang]}</p>
 
           <p class="mono mt-6 text-xs text-muted">{c.highlightsLabel}</p>
@@ -100,6 +100,10 @@ const pad = (n: number) => String(n).padStart(2, '0');
     flex-shrink: 0;
   }
   .bk-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3em;
+    min-height: 44px; /* touch target */
     text-decoration: underline;
     text-underline-offset: 4px;
     text-decoration-thickness: 1.5px;

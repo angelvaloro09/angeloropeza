@@ -16,12 +16,12 @@ const copy = pathCopy[lang];
 const rotations = ['-0.75deg', '0.6deg', '-0.5deg', '0.75deg'];
 ---
 
-<section id="path" class="mx-auto max-w-7xl px-6 py-24 sm:py-32">
-  <div class="reveal mb-12 sm:mb-16">
+<section id="path" class="mx-auto max-w-7xl px-6 section-y">
+  <div class="reveal mb-[var(--section-gap)]">
     <p class="mono mb-3 text-xs uppercase tracking-widest text-[var(--muted)]">
       {tr.path}
     </p>
-    <h2 class="display text-4xl sm:text-5xl md:text-7xl font-bold tracking-tight text-[var(--ink)]">
+    <h2 class="display h-section font-bold tracking-tight text-[var(--ink)]">
       {copy.sectionTitlePrefix} <span class="serif-accent font-normal italic text-[var(--accent)]">{copy.sectionTitleAccent}</span>
     </h2>
     <p class="mt-4 max-w-xl text-base sm:text-lg text-[var(--muted)] font-normal">
@@ -90,7 +90,7 @@ const rotations = ['-0.75deg', '0.6deg', '-0.5deg', '0.75deg'];
                     </span>
                   </div>
 
-                  <h3 class="display text-2xl sm:text-3xl lg:text-4xl font-bold text-[var(--ink)] tracking-tight">
+                  <h3 class="display h-card font-bold text-[var(--ink)] tracking-tight">
                     {entry.title[lang]}
                   </h3>
 

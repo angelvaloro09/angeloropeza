@@ -47,11 +47,11 @@ const groups = groupIds.map((id) => ({
 }));
 ---
 
-<section id="stack" class="stack mx-auto max-w-7xl px-6 py-32" aria-labelledby="stack-title">
-  <header class="mb-16 grid items-end gap-8 md:grid-cols-12">
+<section id="stack" class="stack mx-auto max-w-7xl px-6 section-y" aria-labelledby="stack-title">
+  <header class="mb-[var(--section-gap)] grid items-end gap-8 md:grid-cols-12">
     <div class="reveal relative md:col-span-8">
       <p class="mono mb-5 text-sm text-muted">{c.eyebrow}</p>
-      <h2 id="stack-title" class="display text-5xl font-bold md:text-7xl">
+      <h2 id="stack-title" class="display h-section font-bold">
         {c.title.before}<span class="serif-accent relative inline-block font-normal">
           {c.title.accent}
           <Doodle kind="underline" class="absolute -bottom-2 left-0 w-full text-accent" />
@@ -65,7 +65,7 @@ const groups = groupIds.map((id) => ({
     {groups.map((g) => (
       <article class="note bento-card" data-g={g.id} style={`--r:${rotations[g.id]}`} aria-labelledby={`stack-${g.id}`}>
         <div class="flex items-start justify-between gap-4">
-          <h3 id={`stack-${g.id}`} class="display text-2xl font-bold md:text-3xl">{g.title}</h3>
+          <h3 id={`stack-${g.id}`} class="display h-card-sm font-bold">{g.title}</h3>
           <Doodle kind={doodles[g.id]} class:list={['mt-1 shrink-0 text-ink', doodleSize[g.id]]} />
         </div>
 

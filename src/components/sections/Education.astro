@@ -1,0 +1,173 @@
+---
+import { cecyt, upiicsa } from '@/data/education';
+import type { Lang } from '@/data/profile';
+import Doodle from '@/components/ui/Doodle.astro';
+import { educationCopy } from '@/i18n/sections/education';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const c = educationCopy[lang];
+
+const doneCount = upiicsa.semesters.filter((s) => s.state === 'done').length;
+const currentSemester = upiicsa.semesters.find((s) => s.state === 'current');
+const periods = Array.from({ length: upiicsa.totalSemesters }, (_, i) => {
+  const n = i + 1;
+  const sem = upiicsa.semesters.find((s) => s.n === n);
+  return { n, state: sem?.state ?? 'todo' };
+});
+---
+
+<section id="education" class="edu mx-auto max-w-7xl px-6 py-32" aria-labelledby="edu-title">
+  <header class="mb-16 grid items-end gap-8 md:grid-cols-12">
+    <div class="reveal relative md:col-span-8">
+      <p class="mono mb-5 text-sm text-muted">{c.eyebrow}</p>
+      <h2 id="edu-title" class="display text-5xl font-bold md:text-7xl">
+        {c.title.before}<span class="serif-accent relative inline-block font-normal">
+          {c.title.accent}
+          <Doodle kind="squiggle" class="absolute -bottom-3 left-0 w-full text-accent" />
+        </span>
+      </h2>
+    </div>
+    <p class="reveal text-lg leading-relaxed text-muted md:col-span-4">{c.intro}</p>
+  </header>
+
+  <div class="grid gap-10 lg:grid-cols-12">
+    <!-- CECyT 3 -->
+    <article class="reveal note edu-card p-7 md:p-9 lg:col-span-5" style="--r:-0.7deg" aria-labelledby="edu-cecyt">
+      <p class="mono text-xs text-muted">{c.cecytLabel}</p>
+      <h3 id="edu-cecyt" class="display mt-3 text-3xl font-bold md:text-4xl">{cecyt.program[lang]}</h3>
+      <p class="mt-2 text-sm text-muted">{cecyt.school[lang]}</p>
+      <p class="mono mt-2 text-xs"><span class="edu-plan">{cecyt.plan[lang]}</span></p>
+      <p class="mt-5 leading-relaxed">{cecyt.objective[lang]}</p>
+
+      <div class="mt-7 space-y-5">
+        {cecyt.groups.map((g) => (
+          <section aria-label={g.label[lang]}>
+            <h4 class="mono text-xs text-muted">{g.label[lang]}</h4>
+            <ul class="mt-2 flex flex-wrap gap-x-1 gap-y-1.5 text-sm leading-snug">
+              {g.units.map((unit) => (
+                <li class="edu-unit">{unit[lang]}</li>
+              ))}
+            </ul>
+          </section>
+        ))}
+      </div>
+    </article>
+
+    <!-- UPIICSA -->
+    <article class="reveal note edu-card p-7 md:p-9 lg:col-span-7" style="--r:0.6deg" aria-labelledby="edu-upiicsa">
+      <div class="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <p class="mono text-xs text-muted">{c.upiicsaLabel}</p>
+          <h3 id="edu-upiicsa" class="display mt-3 text-3xl font-bold md:text-4xl">{upiicsa.program[lang]}</h3>
+          <p class="mt-2 text-sm text-muted">{upiicsa.school[lang]}</p>
+          <p class="mono mt-2 text-xs"><span class="edu-plan">{upiicsa.plan[lang]}</span></p>
+        </div>
+        <div class="hidden md:block" aria-hidden="true"><Doodle kind="asterisk" class="w-9 rotate-12 text-accent" /></div>
+      </div>
+
+      <div class="mt-7">
+        <ol class="edu-track" role="img" aria-label={c.progressAria(currentSemester?.n ?? doneCount + 1, upiicsa.totalSemesters)}>
+          {periods.map((p) => <li class="edu-step" data-state={p.state}><span>{p.n}</span></li>)}
+        </ol>
+        <p class="mono mt-3 text-xs text-muted">{c.progress(doneCount, upiicsa.totalSemesters)}</p>
+      </div>
+
+      <div class="mt-8 space-y-6">
+        {upiicsa.semesters.map((s) => (
+          <section class="edu-sem" data-state={s.state} aria-labelledby={`edu-sem-${s.n}`}>
+            <div class="flex items-baseline justify-between gap-3">
+              <h4 id={`edu-sem-${s.n}`} class="display text-xl font-bold">{c.semester(s.n)}</h4>
+              <span class="edu-state mono" data-state={s.state}>{s.state === 'current' ? c.current : c.done}</span>
+            </div>
+            <ul class="mt-3 flex flex-wrap gap-x-1 gap-y-1.5 text-sm leading-snug">
+              {s.units.map((unit) => (
+                <li class="edu-unit">{unit[lang]}</li>
+              ))}
+            </ul>
+          </section>
+        ))}
+      </div>
+    </article>
+  </div>
+
+  <p class="mono mt-8 text-xs text-muted">{c.source}</p>
+</section>
+
+<style>
+  .edu-card {
+    transform: rotate(var(--r, 0deg));
+  }
+  .edu-card:hover {
+    transform: rotate(0deg) translate(-2px, -2px);
+  }
+  .edu-plan {
+    border: 1px dashed var(--ink);
+    border-radius: 999px;
+    padding: 0.15rem 0.65rem;
+  }
+  .edu-unit {
+    display: inline-flex;
+    align-items: center;
+  }
+  .edu-unit:not(:last-child)::after {
+    content: '';
+    width: 3px;
+    height: 3px;
+    margin: 0 0.55rem;
+    border-radius: 50%;
+    background: currentColor;
+    opacity: 0.4;
+  }
+  .edu-track {
+    display: grid;
+    grid-template-columns: repeat(8, minmax(0, 1fr));
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .edu-step {
+    display: grid;
+    place-items: center;
+    height: 2rem;
+    border: 1.5px solid var(--ink);
+    border-radius: 8px;
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 0.75rem;
+  }
+  .edu-step[data-state='done'] {
+    background: var(--ink);
+    color: var(--surface);
+  }
+  .edu-step[data-state='current'] {
+    background: var(--accent-soft);
+    border-color: var(--accent-text);
+    color: var(--ink);
+    box-shadow: 2px 2px 0 var(--accent-text);
+  }
+  .edu-step[data-state='todo'] {
+    border-style: dashed;
+    opacity: 0.45;
+  }
+  .edu-sem[data-state='current'] {
+    border-left: 3px solid var(--accent-text);
+    padding-left: 1rem;
+  }
+  .edu-state {
+    font-size: 0.7rem;
+    color: var(--muted);
+  }
+  .edu-state[data-state='current'] {
+    color: var(--accent-text);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .edu-card,
+    .edu-card:hover {
+      transform: none;
+    }
+  }
+</style>

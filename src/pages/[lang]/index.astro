@@ -1,8 +1,11 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import Hero from '@/components/sections/Hero.astro';
-import Projects from '@/components/sections/Projects.astro';
-import Skills from '@/components/sections/Skills.astro';
+import Proof from '@/components/sections/Proof.astro';
+import Work from '@/components/sections/Work.astro';
+import Backend from '@/components/sections/Backend.astro';
+import StackBento from '@/components/sections/StackBento.astro';
+import Education from '@/components/sections/Education.astro';
 import Timeline from '@/components/sections/Timeline.astro';
 import Contact from '@/components/sections/Contact.astro';
 import type { Lang } from '@/data/profile';
@@ -14,8 +17,11 @@ const lang = Astro.params.lang as Lang;
 ---
 <BaseLayout lang={lang}>
   <Hero lang={lang} />
-  <Projects lang={lang} />
-  <Skills lang={lang} />
+  <Proof lang={lang} />
+  <Work lang={lang} />
+  <Backend lang={lang} />
+  <StackBento lang={lang} />
+  <Education lang={lang} />
   <Timeline lang={lang} />
   <Contact lang={lang} />
 </BaseLayout>
